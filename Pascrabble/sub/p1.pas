@@ -5,28 +5,40 @@ program principal;
 { Con esta directiva queda incluido el archivo tarea2.pas }
 {$INCLUDE ../tarea2.pas}
 
-var 
-    i: integer;
-    his: Histograma;
-    c: Char;
-    p1: Palabra;
-    p2: Palabra;
-    ora: array[1..10] of Texto;
+function crearDiccionario():Texto;
+   var
+      dicc: Texto;
 begin
-    {iniciar oración ora}
-    iniciarOracion(ora);
-    {inicializar histograma his}
-    inicializarHistograma(his);
-    {inicializar palabra ora[1]^.info}
-    for i in [1..10] do
-    begin
-        initPalabra(['h', 'o', 'l', 'z'], ora[i]^.info);
-    end;
-    {preguntar si es el siguiente de ora[10] = nil}
-    if ora[10]^.sig = nil then
-        writeln('El último nodo de la oración es nil')
-    else
-        writeln('El último nodo de la oración no es nil');
+   {crear un diccionario de palabras con newTexto(var tex : Texto; t: array of char) y addTexto(var tex : Texto; t: array of char)}
+   newTexto(dicc, ['h', 'o', 'l', 'a']);
+   addTexto(dicc, ['m', 'u', 'n', 'd', 'o']);
+   addTexto(dicc, ['p', 'a', 's', 'c', 'r', 'a', 'b', 'l', 'e']);
+   addTexto(dicc, ['p', 'r', 'o', 'g', 'r', 'a', 'm', 'a', 'd', 'o']);
+   addTexto(dicc, ['t', 'e', 's', 't']);
+   addTexto(dicc, ['e', 'j', 'e', 'm', 'p', 'l', 'o']);
+   addTexto(dicc, ['d', 'i', 'c', 'c', 'i', 'o', 'n', 'a', 'r', 'i', 'o']);
+   addTexto(dicc, ['p', 'a', 'l', 'a', 'b', 'r', 'a']);
+   crearDiccionario := dicc; {inicializar el diccionario a nil}
+end;
+
+var 
+   i: integer;
+   his: Histograma;
+   c: Char;
+   p1: Palabra;
+   p2: Palabra;
+   ora: array[1..10] of Texto;
+   txt: Texto;
+   dicc: Texto;
+   booleano: boolean;
+   fichas: InfoFichas;
+   mano: Atril;
+   tab: Tablero;
+begin
+
+   inicializarTablero(tab);
+   mostrarTablero(tab);
+   
 end.
 
 {

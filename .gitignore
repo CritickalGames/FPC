@@ -1,5 +1,5 @@
-*.exe
-*.o
+p1.exe
+p1.o
 #ignorar GPATH, GRTAGS, GTAGS. No tienen terminación de punto.
 GPATH
 GRTAGS

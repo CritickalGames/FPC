@@ -40,6 +40,28 @@ begin
     end;
     ora[9]^.sig := nil; {el último nodo apunta a nil}
 end;
+procedure newTexto(var tex : Texto; t: array of char);
+begin
+    new(tex); {crear un nuevo nodo}
+    { Inicializa el texto `tex` con una palabra formada por los caracteres de `t`. }
+    initPalabra(t, tex^.info);
+    tex^.sig := nil; {inicializa el siguiente nodo a nil}    
+end;
+procedure addTexto(var tex : Texto; t: array of char);
+    var
+        nuevo : Texto;
+        puntero: texto;
+begin
+    newTexto(nuevo, t); {inicializar el nuevo nodo con la palabra t}
+    {encontrar el último nodo de la lista}
+    puntero := tex;
+    while puntero^.sig <> nil do
+    begin
+        puntero := puntero^.sig; {avanzar al siguiente nodo}
+    end;
+    puntero^.sig := nuevo; {agregar el nuevo nodo al final de la lista}
+end;
+
 {
 type
 
@@ -140,6 +162,7 @@ function iguales(pal1, pal2 : Palabra) : boolean;
         i : integer;
         igual : boolean;
 begin
+    {mostrar palabra 1 y palabra 2}
     if pal1.tope <> pal2.tope then
     begin
         igual := false;
@@ -156,6 +179,7 @@ begin
         end;
         i:= i-1; { Ajustar i para que no se salga del rango }
     end;
+    { Devolver el resultado de la comparación }
     iguales := igual and (i<=pal1.tope);
 end;
 
@@ -176,20 +200,67 @@ end;
 function esPalabraValida(pal : Palabra; dicc : Texto) : boolean;
     { Dada una palabra `pal` y un diccionario `dicc`, verifica si la palabra
     está en el texto dicc. }
+    var 
+        bandera : boolean;
 begin
+    bandera := true; {inicializar bandera a true}
+    esPalabraValida := false; {la palabra no es válida por defecto}
+    {recorrer el diccionario hasta que sea nulo}
+    while (dicc <> nil) and bandera do
+    begin
+        {si la palabra es igual a la palabra del diccionario}
+        if iguales(pal, dicc^.info) then
+        begin
+            esPalabraValida := true; {la palabra es válida}
+            bandera := false; {salir del bucle}
+        end
+        else
+            {avanzar al siguiente nodo del diccionario}
+            dicc := dicc^.sig;
+    end;
 end;
 
 procedure removerLetraAtril(var mano : Atril; let : char);
     { Dada una letra `let`, elimina la primera aparición de esta
     del atril y deja a su lugar la última letra del atril.
     Se asume que la letra está en el atril. }
+    var 
+        i, pos : integer;
 begin
+    pos := -1; {inicializar posición a -1}
+    {buscar la letra en el atril}
+    i:=1; 
+    while (pos = -1) and (i <= mano.tope) do
+    begin
+        if mano.letras[i] = let then
+        begin
+            pos := i; {guardar la posición de la letra}
+        end;
+        i := i + 1; {avanzar al siguiente índice}
+    end;
+    {si se encontró la letra}
+    if pos <> -1 then
+    begin
+        mano.letras[pos] := mano.letras[mano.tope]; {reemplazar la letra por la última}
+        mano.tope := mano.tope - 1; {disminuir el tope del atril}
+    end;
 end;
 
 function entraEnTablero(pal : Palabra; pos : Posicion) : boolean;
     { Verifica si la palabra `pal` entra en el tablero a partir de la posición `pos`,
     teniendo en cuenta que no debe salirse de los límites del tablero. }
 begin
+    { Verificar si la palabra entra en el tablero según la dirección }
+    if pos.direccion = Horizontal then
+    begin
+        { Verificar si la palabra cabe en la fila indicada }
+        entraEnTablero := (pos.col + pal.tope - 1 <= MAXCOLUMNAS);
+    end
+    else
+    begin
+        { Verificar si la palabra cabe en la columna indicada }
+        entraEnTablero := (ord(pos.fila) + pal.tope - 1 <= ord(MAXFILAS));
+    end;
 end;
 
 procedure siguientePosicion(var pos : Posicion);
