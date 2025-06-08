@@ -1,0 +1,234 @@
+
+type letras= array [1 .. MAXPAL] of Letra;
+procedure initPalabra(s: letras ; var p: Palabra);
+    var
+        i: integer;
+begin
+    {recorrer s hasta que s[i] sea nulo}
+    i := 1;
+    while (i <= MAXPAL) and (s[i] <> #0) do
+    begin
+        p.cadena[i] := s[i]; {asignar la letra a la palabra}
+        i := i + 1; {incrementar el contador}
+    end;
+    p.tope := i - 1; {asignar el tope de la palabra}
+end;
+procedure inicializarHistograma(var hist : Histograma);
+    { Inicializa el histograma a cero. }
+    var 
+        c : Letra;
+begin
+        {recorrer cada letra de [a..z] y contar las ocurrencias de cada letra en `pal`}
+        for c in ['a'..'z'] do
+        begin
+            {comprueba si la letra vale menos que 1 inicializa en 0}
+            if hist[c] < 1 then
+                hist[c] := 0; {inicializar el contador de cada letra a 0}        
+        end;
+end;
+procedure iniciarOracion(var ora : Texto);
+    { Inicializa la oración a nil. }
+    var 
+        i : integer;
+begin
+    {inicializar ora; ora[1]^.sig := ora[2];}
+    i := 1;
+    {inicializar el primer nodo de ora}
+    new(ora[i]);
+    for i in 2..10 do
+    begin
+        new(ora[i]);
+        ora[i - 1]^.sig := ora[i];        
+    end;
+    ora[10]^.sig := nil; {el último nodo apunta a nil}
+end;
+{
+type
+
+   Letra        = 'a' .. 'z';
+   Palabra	= record
+      cadena : array [1 .. MAXPAL] of Letra;
+      tope   : 0 .. MAXPAL
+   end;
+
+   Histograma =  array [Letra] of integer;
+
+   InfoFicha = record
+      puntaje : integer;
+      cantidad : integer;
+   end;
+
+   InfoFichas = array[Letra] of InfoFicha;
+
+   TipoBonus = (Ninguno, DobleLetra, TriplePalabra, Trampa);
+
+   Casillero = record
+      bonus : TipoBonus;
+      case ocupada : boolean of
+         true : (ficha : Letra);
+         false : (); 
+   end;
+
+   Tablero = array['A'..MAXFILAS, 1..MAXCOLUMNAS] of Casillero;
+
+   TipoDireccion = (Horizontal, Vertical);
+   Posicion = record
+      direccion : TipoDireccion;
+      fila : 'A'..MAXFILAS;
+      col  : 1..MAXCOLUMNAS;
+   end;
+
+
+   BolsaFichas = record
+      letras : array[1..TOTALFICHAS] of Letra;
+      tope : 0 .. TOTALFICHAS;
+   end;
+
+   Atril = record
+      letras : array[1..MAXATRIL] of Letra;
+      tope : 0 .. MAXATRIL;
+   end;
+
+   Texto	= ^NodoPal; 
+   NodoPal	= record  
+      info : Palabra;
+      sig  : Texto
+   end;
+
+   TipoResultado = (Valida, NoEntra, NoFichas, NoExiste);
+
+   ResultadoJugada = record
+      palabra : Palabra;
+      pos : Posicion;
+      case tipo : TipoResultado of
+         Valida : (puntaje : integer);
+         NoEntra : ();
+         NoFichas : ();
+         NoExiste  : ();
+   end;
+
+   HistorialJugadas = ^NodoJugada;
+   NodoJugada = record
+      palabra : Palabra;
+      pos : Posicion;
+      puntaje : integer;
+      sig : HistorialJugadas
+   end;
+}
+procedure calcularHistograma(pal : Palabra; var hist : Histograma);
+    { Retorna en `hist` el histograma de `pal`, es decir la cantidad
+    de ocurrencias de cada letra en esa palabra.
+    No se puede asumir el estado inicial de histograma. }
+
+    var 
+        i : integer;
+begin
+        {recorrer cada letra de la palabra}
+        for i := 1 to pal.tope do
+        begin
+            {si la letra de la palabra es igual a la letra del histograma}
+            if pal.cadena[i] in ['a'..'z'] then
+            begin
+                {incrementar el contador de esa letra en el histograma}
+                hist[pal.cadena[i]] := hist[pal.cadena[i]] + 1;
+            end;
+        end;
+end;
+
+function iguales(pal1, pal2 : Palabra) : boolean;
+    { Dadas dos palabras, `pa1` y `pal2`, verifica si son iguales. Devolver con iguales:=}
+    {Asumiremos que las palabras serán formateadas antes de llamar a iguales}
+    var 
+        i : integer;
+        igual : boolean;
+begin
+    if pal1.tope <> pal2.tope then
+    begin
+        igual := false;
+    end
+    else
+    begin
+        i := 1;
+        igual := true;
+        while (i <= pal1.tope) and igual do
+        begin
+            if pal1.cadena[i] <> pal2.cadena[i] then
+                igual := false;
+            i := i + 1;
+        end;
+        i:= i-1; { Ajustar i para que no se salga del rango }
+    end;
+    iguales := igual and (i<=pal1.tope);
+end;
+
+procedure calcularHistogramaTexto(tex : Texto; var hist : Histograma);
+    { Retorna en `hist` la cantidad de ocurrencias de cada letra en el texto `tex`.
+    No se puede asumir el estado inicial de `hist`. }
+begin
+    {inicializar el histograma a 0}
+    inicializarHistograma(hist);
+    {recorrer el texto hasta que sea nulo}
+    while tex <> nil do
+    begin
+        {calcular el histograma de la palabra}
+        calcularHistograma(tex^.info, hist);
+        {avanzar al siguiente nodo del texto}
+        tex := tex^.sig;
+    end;
+end;
+
+function esPalabraValida(pal : Palabra; dicc : Texto) : boolean;
+    { Dada una palabra `pal` y un diccionario `dicc`, verifica si la palabra
+    está en el texto dicc. }
+begin
+end;
+
+procedure removerLetraAtril(var mano : Atril; let : char);
+    { Dada una letra `let`, elimina la primera aparición de esta
+    del atril y deja a su lugar la última letra del atril.
+    Se asume que la letra está en el atril. }
+begin
+end;
+
+function entraEnTablero(pal : Palabra; pos : Posicion) : boolean;
+    { Verifica si la palabra `pal` entra en el tablero a partir de la posición `pos`,
+    teniendo en cuenta que no debe salirse de los límites del tablero. }
+begin
+end;
+
+procedure siguientePosicion(var pos : Posicion);
+    { Actualiza la posición `pos`, devuelve en la misma variable la posición del 
+    siguiente casillero en la dirección indicada en `pos`. 
+    Se asume que `pos` no corresponde a la última fila si la dirección es vertical, 
+    ni a la última columna si la dirección es horizontal. }
+begin
+end;
+
+function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero) : boolean;
+    { Verifica que la palabra `pal` puede armarse a partir de la posición `pos`, 
+    considerando las letras disponibles en el atril y en el tablero (respetando su ubicación).
+    Se puede asumir que la palabra entra en el tablero. }
+begin
+end;
+
+procedure intentarArmarPalabra(pal : Palabra; pos : Posicion; 
+                              var tab : Tablero; var mano : Atril; 
+                              dicc : Texto; info : InfoFichas; 
+                              var resu : ResultadoJugada);
+    { Dada una palabra, posición, tablero, atril, diccionario, info y un resultado.}
+    { En primer lugar, se verifica que la palabra entre en el tablero dada la posición. }
+    { Luego que se pueda armar la palabra en el tablero con las fichas disponibles }
+    { y por último que la palabra exista en el diccionario. }
+    { Si es posible armar la palabra, esta se agrega en el tablero, actualiza `resu.tipo` y 
+    almacena el puntaje en `resu.puntaje`.
+    Para calcular el puntaje, se suman los puntos de las letras **agregadas**, utilizando 
+    la información de `info` y la bonificación del casillero. Tanto para el puntaje calculado
+    como para las bonificaciones **NO** suman las letras ya existentes en el tablero que conforman la palabra. 
+    Si no se puede armar la palabra, devuelve el resultado correspondiente en `resu.tipo`. }
+begin
+end;
+
+procedure registrarJugada(var jugadas : HistorialJugadas; pal : Palabra; pos : Posicion; puntaje : integer);
+    { Dada una lista de jugadas, una palabra, Posicion y puntaje, agrega la jugada al final de la lista }
+begin
+end;
