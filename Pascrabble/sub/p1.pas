@@ -20,13 +20,16 @@ begin
     {inicializar palabra ora[1]^.info}
     for i in [1..10] do
     begin
-        initPalabra(['h', 'o', 'l', 'a'], ora[i]^.info);
+        initPalabra(['h', 'o', 'l', 'z'], ora[i]^.info);
     end;
+    {preguntar si es el siguiente de ora[10] = nil}
+    if ora[10]^.sig = nil then
+        writeln('El último nodo de la oración es nil')
+    else
+        writeln('El último nodo de la oración no es nil');
 end.
 
 {
-type letras= array [1 .. MAXPAL] of Letra;
-
 const
    MAXATRIL = 7; 
    MAXFILAS = 'I';   
