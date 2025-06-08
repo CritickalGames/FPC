@@ -1,0 +1,10 @@
+*.exe
+*.o
+#ignorar GPATH, GRTAGS, GTAGS. No tienen terminación de punto.
+GPATH
+GRTAGS
+GTAGS
+# .vscode
+.vscode/
+# Ignorar archivos de la carpeta p1
+p1/

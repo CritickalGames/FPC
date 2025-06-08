@@ -1,17 +1,14 @@
-
-type letras= array [1 .. MAXPAL] of Letra;
-procedure initPalabra(s: letras ; var p: Palabra);
+procedure initPalabra(s: array of char ; var p: Palabra);
     var
         i: integer;
 begin
     {recorrer s hasta que s[i] sea nulo}
-    i := 1;
-    while (i <= MAXPAL) and (s[i] <> #0) do
+    for i in [0..length(s)-1]do
     begin
-        p.cadena[i] := s[i]; {asignar la letra a la palabra}
-        i := i + 1; {incrementar el contador}
+        p.cadena[i+1] := s[i]; {asignar la letra a la palabra}
     end;
-    p.tope := i - 1; {asignar el tope de la palabra}
+    {asignar el tope de la palabra}
+    p.tope := length(s); {asignar el tope de la palabra}
 end;
 procedure inicializarHistograma(var hist : Histograma);
     { Inicializa el histograma a cero. }
@@ -26,7 +23,8 @@ begin
                 hist[c] := 0; {inicializar el contador de cada letra a 0}        
         end;
 end;
-procedure iniciarOracion(var ora : Texto);
+procedure iniciarOracion(var ora : array of Texto);
+    { Inicializa la oración `ora` con 10 nodos, cada uno apuntando al siguiente.
     { Inicializa la oración a nil. }
     var 
         i : integer;
@@ -34,13 +32,13 @@ begin
     {inicializar ora; ora[1]^.sig := ora[2];}
     i := 1;
     {inicializar el primer nodo de ora}
-    new(ora[i]);
-    for i in 2..10 do
+    new(ora[0]);
+    for i in [1..9] do
     begin
         new(ora[i]);
         ora[i - 1]^.sig := ora[i];        
     end;
-    ora[10]^.sig := nil; {el último nodo apunta a nil}
+    ora[9]^.sig := nil; {el último nodo apunta a nil}
 end;
 {
 type
@@ -165,8 +163,6 @@ procedure calcularHistogramaTexto(tex : Texto; var hist : Histograma);
     { Retorna en `hist` la cantidad de ocurrencias de cada letra en el texto `tex`.
     No se puede asumir el estado inicial de `hist`. }
 begin
-    {inicializar el histograma a 0}
-    inicializarHistograma(hist);
     {recorrer el texto hasta que sea nulo}
     while tex <> nil do
     begin

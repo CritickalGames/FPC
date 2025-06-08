@@ -6,19 +6,36 @@ program principal;
 {$INCLUDE ../tarea2.pas}
 
 var 
-    c: Char;
-    i: Integer;
+    i: integer;
     his: Histograma;
+    c: Char;
     p1: Palabra;
     p2: Palabra;
-    {arreglo de largo 10 y tipo Texto}
     ora: array[1..10] of Texto;
 begin
-    {inicializar oración}
+    {iniciar oración ora}
     iniciarOracion(ora);
+    {inicializar histograma his}
+    inicializarHistograma(his);
+    {inicializar palabra ora[1]^.info}
+    for i in [1..10] do
+    begin
+        initPalabra(['h', 'o', 'l', 'a'], ora[i]^.info);
+    end;
 end.
 
 {
+type letras= array [1 .. MAXPAL] of Letra;
+
+const
+   MAXATRIL = 7; 
+   MAXFILAS = 'I';   
+   MAXCOLUMNAS = 9; 
+   MAXPAL  = 30;      
+   TOTALFICHAS = 100; 
+   MAXPUNTAJE = 10; 
+   RANDSEEDC = 42; 
+
 type
 
    Letra        = 'a' .. 'z';
