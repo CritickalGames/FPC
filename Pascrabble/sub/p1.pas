@@ -28,7 +28,6 @@ var
    p1: Palabra;
    p2: Palabra;
    ora: array[1..10] of Texto;
-   txt: Texto;
    dicc: Texto;
    booleano: boolean;
    fichas: InfoFichas;
@@ -39,6 +38,8 @@ var
 begin
    //TODO inicializar variables
    inicializarTablero(tab);
+   {iniciar diccionario}
+   dicc := crearDiccionario();
    {inicializar fichas en 0}
    for c := 'a' to 'z' do
    begin
@@ -67,8 +68,6 @@ begin
       var resu : ResultadoJugada
    )}
    intentarArmarPalabra(p1, pos, tab, mano, dicc, fichas, resu);
-   booleano:=puedeArmarPalabra(p1, pos, mano, tab); {(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero)}
-   writeln('Puede armar la palabra "hola": ', booleano);
 end.
 
 {

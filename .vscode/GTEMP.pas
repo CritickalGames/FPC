@@ -356,19 +356,18 @@ begin
         resu.tipo := NoExiste; {la palabra no existe en el diccionario}
         b:= false; {no se puede armar la palabra}
     end;
-
     if b then
     begin{ Si llega hasta aquí, la palabra es válida y se puede armar }
-        resu.tipo := Valida; {la palabra es válida}
-        resu.palabra := pal; {guardar la palabra en el resultado}
-        resu.pos := pos; {guardar la posición en el resultado}
-
+        resu.tipo := Valida;
+        resu.palabra := pal;
+        resu.pos := pos; 
         { Calcular el puntaje de la jugada }
-        resu.puntaje := 0; {inicializar el puntaje a 0}
+        resu.puntaje := 0;
         
         for i in [1..pal.tope] do
         begin
             if not (tab[pos.fila, pos.col].ocupada) then
+                {a resultado le sumamos info del encabezado}
                 resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
             siguientePosicion(pos); {avanzar a la siguiente posición}
         end;
@@ -377,5 +376,22 @@ end;
 
 procedure registrarJugada(var jugadas : HistorialJugadas; pal : Palabra; pos : Posicion; puntaje : integer);
     { Dada una lista de jugadas, una palabra, Posicion y puntaje, agrega la jugada al final de la lista }
+    var 
+        nuevaJugada : HistorialJugadas;
 begin
+    new(nuevaJugada); {crear un nuevo nodo}
+    nuevaJugada^.palabra := pal; {asignar la palabra}
+    nuevaJugada^.pos := pos; {asignar la posición}
+    nuevaJugada^.puntaje := puntaje; {asignar el puntaje}
+    nuevaJugada^.sig := nil; {inicializar el siguiente nodo a nil}
+
+    if jugadas = nil then
+        jugadas := nuevaJugada {si la lista está vacía, asignar la nueva jugada como la primera}
+    else
+    begin
+        var aux : HistorialJugadas := jugadas;
+        while aux^.sig <> nil do
+            aux := aux^.sig; {avanzar al final de la lista}
+        aux^.sig := nuevaJugada; {agregar la nueva jugada al final de la lista}
+    end;
 end;
