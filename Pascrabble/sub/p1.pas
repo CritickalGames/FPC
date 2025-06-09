@@ -35,10 +35,20 @@ var
    mano: Atril;
    tab: Tablero;
 begin
-
    inicializarTablero(tab);
    mostrarTablero(tab);
-   
+   {iniciar atril}
+   iniciarAtril(mano);
+   {inicializar fichas en 0}
+   for c := 'a' to 'z' do
+   begin
+      fichas[c].cantidad := 1;
+      fichas[c].puntaje := 2;
+   end;
+   {rellenar atril con fichas}
+   rellenarAtril(mano);
+   {mostrar mostrarAtril}
+   mostrarAtril(mano, fichas);
 end.
 
 {

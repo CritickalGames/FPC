@@ -252,15 +252,11 @@ function entraEnTablero(pal : Palabra; pos : Posicion) : boolean;
 begin
     { Verificar si la palabra entra en el tablero según la dirección }
     if pos.direccion = Horizontal then
-    begin
         { Verificar si la palabra cabe en la fila indicada }
-        entraEnTablero := (pos.col + pal.tope - 1 <= MAXCOLUMNAS);
-    end
+        entraEnTablero := (pos.col + pal.tope - 1 <= MAXCOLUMNAS)
     else
-    begin
         { Verificar si la palabra cabe en la columna indicada }
         entraEnTablero := (ord(pos.fila) + pal.tope - 1 <= ord(MAXFILAS));
-    end;
 end;
 
 procedure siguientePosicion(var pos : Posicion);
@@ -269,13 +265,51 @@ procedure siguientePosicion(var pos : Posicion);
     Se asume que `pos` no corresponde a la última fila si la dirección es vertical, 
     ni a la última columna si la dirección es horizontal. }
 begin
+    { Actualizar la posición según la dirección }
+    if pos.direccion = Horizontal then
+        pos.col := pos.col + 1 { Avanzar a la siguiente columna }
+    else
+        pos.fila := chr(ord(pos.fila) + 1); { Avanzar a la siguiente fila }
 end;
 
 function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero) : boolean;
     { Verifica que la palabra `pal` puede armarse a partir de la posición `pos`, 
     considerando las letras disponibles en el atril y en el tablero (respetando su ubicación).
     Se puede asumir que la palabra entra en el tablero. }
+    var 
+        i, j : integer;
+        booleano : boolean;
 begin
+    {compruebo si entra en el tablero}
+    if entraEnTablero(pal, pos) then
+        puedeArmarPalabra := false {no entra en el tablero}
+    else
+    begin
+        {inicializar la variable de retorno a true}
+        puedeArmarPalabra := true;
+        {recorrer cada letra de la palabra}
+        i:= 1; {inicializar el índice de la palabra}
+        booleano := true; {inicializar la variable booleana a true}
+        while (i <=pal.tope) and (booleano) do
+        begin
+            {si la letra de la celda está en el tablero y no en la palabra}
+            if (tab[pos.fila, pos.col].ocupada) and (tab[pos.fila, pos.col].ficha <> pal.cadena[i]) then
+            begin
+                puedeArmarPalabra := false; {no se puede armar la palabra}
+                booleano := false;
+            end
+            else
+            for j in [1..mano.tope] do
+                if not (pal.cadena[i] = mano.letras[j]) then
+                begin
+                    puedeArmarPalabra := false; {no se puede armar la palabra}
+                    booleano := false;
+                end;
+            siguientePosicion(pos); {avanzar a la siguiente posición}
+        end;
+        
+    end;
+
 end;
 
 procedure intentarArmarPalabra(pal : Palabra; pos : Posicion; 
