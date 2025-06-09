@@ -35,6 +35,7 @@ var
    tab: Tablero;
    pos: Posicion;
    resu: ResultadoJugada;
+   jugadas : HistorialJugadas;
 begin
    //TODO inicializar variables
    inicializarTablero(tab);
@@ -62,12 +63,10 @@ begin
    mostrarAtril(mano, fichas);
    //TODO operar
    {(
-      pal : Palabra; pos : Posicion; 
-      var tab : Tablero; var mano : Atril; 
-      dicc : Texto; info : InfoFichas; 
-      var resu : ResultadoJugada
+      var jugadas : HistorialJugadas; pal : Palabra; pos : Posicion; puntaje : integer
    )}
-   intentarArmarPalabra(p1, pos, tab, mano, dicc, fichas, resu);
+   registrarJugada(jugadas, p1, pos, 10);
+
 end.
 
 {

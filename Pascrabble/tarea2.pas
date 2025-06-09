@@ -56,9 +56,7 @@ begin
     {encontrar el último nodo de la lista}
     puntero := tex;
     while puntero^.sig <> nil do
-    begin
         puntero := puntero^.sig; {avanzar al siguiente nodo}
-    end;
     puntero^.sig := nuevo; {agregar el nuevo nodo al final de la lista}
 end;
 
@@ -378,6 +376,7 @@ procedure registrarJugada(var jugadas : HistorialJugadas; pal : Palabra; pos : P
     { Dada una lista de jugadas, una palabra, Posicion y puntaje, agrega la jugada al final de la lista }
     var 
         nuevaJugada : HistorialJugadas;
+        aux : HistorialJugadas;
 begin
     new(nuevaJugada); {crear un nuevo nodo}
     nuevaJugada^.palabra := pal; {asignar la palabra}
@@ -389,7 +388,7 @@ begin
         jugadas := nuevaJugada {si la lista está vacía, asignar la nueva jugada como la primera}
     else
     begin
-        var aux : HistorialJugadas := jugadas;
+        aux := jugadas;
         while aux^.sig <> nil do
             aux := aux^.sig; {avanzar al final de la lista}
         aux^.sig := nuevaJugada; {agregar la nueva jugada al final de la lista}
