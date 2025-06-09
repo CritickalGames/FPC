@@ -34,21 +34,41 @@ var
    fichas: InfoFichas;
    mano: Atril;
    tab: Tablero;
+   pos: Posicion;
+   resu: ResultadoJugada;
 begin
+   //TODO inicializar variables
    inicializarTablero(tab);
-   mostrarTablero(tab);
-   {iniciar atril}
-   iniciarAtril(mano);
    {inicializar fichas en 0}
    for c := 'a' to 'z' do
    begin
       fichas[c].cantidad := 1;
       fichas[c].puntaje := 2;
    end;
-   {rellenar atril con fichas}
+   {inicializa la posición}
+   pos.direccion := Horizontal;
+   pos.fila := 'A';
+   pos.col := 1;
+   {inicializar p1}
+   initPalabra(['h', 'o', 'l', 'a'], p1);
+   {iniciar y rellenar atril con fichas}
+   iniciarAtril(mano);
    rellenarAtril(mano);
+   //Todo Mostrar
+   {Mostrar Tablero}
+   mostrarTablero(tab);
    {mostrar mostrarAtril}
    mostrarAtril(mano, fichas);
+   //TODO operar
+   {(
+      pal : Palabra; pos : Posicion; 
+      var tab : Tablero; var mano : Atril; 
+      dicc : Texto; info : InfoFichas; 
+      var resu : ResultadoJugada
+   )}
+   intentarArmarPalabra(p1, pos, tab, mano, dicc, fichas, resu);
+   booleano:=puedeArmarPalabra(p1, pos, mano, tab); {(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero)}
+   writeln('Puede armar la palabra "hola": ', booleano);
 end.
 
 {

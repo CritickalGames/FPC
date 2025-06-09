@@ -281,7 +281,7 @@ function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Ta
         booleano : boolean;
 begin
     {compruebo si entra en el tablero}
-    if entraEnTablero(pal, pos) then
+    if not entraEnTablero(pal, pos) then
         puedeArmarPalabra := false {no entra en el tablero}
     else
     begin
@@ -295,17 +295,22 @@ begin
             {si la letra de la celda está en el tablero y no en la palabra}
             if (tab[pos.fila, pos.col].ocupada) and (tab[pos.fila, pos.col].ficha <> pal.cadena[i]) then
             begin
-                puedeArmarPalabra := false; {no se puede armar la palabra}
                 booleano := false;
+                puedeArmarPalabra := booleano; {no se puede armar la palabra}
             end
             else
-            for j in [1..mano.tope] do
-                if not (pal.cadena[i] = mano.letras[j]) then
-                begin
-                    puedeArmarPalabra := false; {no se puede armar la palabra}
-                    booleano := false;
-                end;
+            j:= 1;
+            booleano := false; {inicializar la variable booleana a false}
+            while (j <= mano.tope) and not booleano do
+            begin
+                if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
+                    booleano := true;
+                {letra, atril y booleano}
+                puedeArmarPalabra := booleano;
+                j:= j + 1;
+            end;
             siguientePosicion(pos); {avanzar a la siguiente posición}
+            i := i + 1; {avanzar al siguiente índice de la palabra}
         end;
         
     end;
@@ -326,7 +331,48 @@ procedure intentarArmarPalabra(pal : Palabra; pos : Posicion;
     la información de `info` y la bonificación del casillero. Tanto para el puntaje calculado
     como para las bonificaciones **NO** suman las letras ya existentes en el tablero que conforman la palabra. 
     Si no se puede armar la palabra, devuelve el resultado correspondiente en `resu.tipo`. }
+    var 
+        i : integer;
+        b: boolean;
 begin
+    b:= true;
+    { Verificar si la palabra entra en el tablero }
+    if not entraEnTablero(pal, pos) then
+    begin
+        resu.tipo := NoEntra; {la palabra no entra en el tablero}
+        b:= false; {no se puede armar la palabra}
+    end;
+
+    { Verificar si se puede armar la palabra }
+    if not puedeArmarPalabra(pal, pos, mano, tab) then
+    begin
+        resu.tipo := NoFichas; {no se pueden armar las fichas}
+        b:= false; {no se puede armar la palabra}
+    end;
+
+    { Verificar si la palabra es válida }
+    if not esPalabraValida(pal, dicc) then
+    begin
+        resu.tipo := NoExiste; {la palabra no existe en el diccionario}
+        b:= false; {no se puede armar la palabra}
+    end;
+
+    if b then
+    begin{ Si llega hasta aquí, la palabra es válida y se puede armar }
+        resu.tipo := Valida; {la palabra es válida}
+        resu.palabra := pal; {guardar la palabra en el resultado}
+        resu.pos := pos; {guardar la posición en el resultado}
+
+        { Calcular el puntaje de la jugada }
+        resu.puntaje := 0; {inicializar el puntaje a 0}
+        
+        for i in [1..pal.tope] do
+        begin
+            if not (tab[pos.fila, pos.col].ocupada) then
+                resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
+            siguientePosicion(pos); {avanzar a la siguiente posición}
+        end;
+    end;
 end;
 
 procedure registrarJugada(var jugadas : HistorialJugadas; pal : Palabra; pos : Posicion; puntaje : integer);
