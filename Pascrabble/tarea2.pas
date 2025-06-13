@@ -159,26 +159,22 @@ function iguales(pal1, pal2 : Palabra) : boolean;
     var 
         i : integer;
         igual : boolean;
-begin
-    {mostrar palabra 1 y palabra 2}
+begin    
+    { Si las palabras no tienen el mismo tope, no son iguales }
     if pal1.tope <> pal2.tope then
-    begin
-        igual := false;
-    end
+        igual := false
     else
     begin
         i := 1;
         igual := true;
         while (i <= pal1.tope) and igual do
         begin
-            if pal1.cadena[i] <> pal2.cadena[i] then
-                igual := false;
+            igual := (pal1.cadena[i] = pal2.cadena[i]);
             i := i + 1;
         end;
-        i:= i-1; { Ajustar i para que no se salga del rango }
     end;
     { Devolver el resultado de la comparación }
-    iguales := igual and (i<=pal1.tope);
+    iguales := igual;
 end;
 
 procedure calcularHistogramaTexto(tex : Texto; var hist : Histograma);

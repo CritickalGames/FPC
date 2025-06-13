@@ -6,5 +6,6 @@ GRTAGS
 GTAGS
 # .vscode
 .vscode/
-# Ignorar archivos de la carpeta p1
+# Ignorar archivos de las carpetas
 p1/
+Pascrabble_test/

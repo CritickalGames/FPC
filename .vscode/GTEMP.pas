@@ -1,397 +1,266 @@
-procedure initPalabra(s: array of char ; var p: Palabra);
-    var
-        i: integer;
+program principal;
+
+{ Con esta directiva queda incluido el archivo definiciones.pas }
+{$INCLUDE definiciones.pas}
+
+{ Con esta directiva queda incluido el archivo tarea2.pas }
+{$INCLUDE ../tarea2.pas}
+
+var
+    tab        : Tablero;
+    dicc       : Texto;
+    pal, pal2  : Palabra;
+    hist       : Histograma;
+    info       : InfoFichas;
+    bolsa      : BolsaFichas;
+    i, num, puntaje, opcion, opcionPascrabble, opcionTests  : integer;
+    mano       : Atril;
+    l          : Letra;
+    pos      : Posicion;
+    resu       : ResultadoJugada;
+    jugadas    : HistorialJugadas;
 begin
-    {recorrer s hasta que s[i] sea nulo}
-    for i in [0..length(s)-1]do
-    begin
-        p.cadena[i+1] := s[i]; {asignar la letra a la palabra}
-    end;
-    {asignar el tope de la palabra}
-    p.tope := length(s); {asignar el tope de la palabra}
-end;
-procedure inicializarHistograma(var hist : Histograma);
-    { Inicializa el histograma a cero. }
-    var 
-        c : Letra;
-begin
-        {recorrer cada letra de [a..z] y contar las ocurrencias de cada letra en `pal`}
-        for c in ['a'..'z'] do
-        begin
-            {comprueba si la letra vale menos que 1 inicializa en 0}
-            if hist[c] < 1 then
-                hist[c] := 0; {inicializar el contador de cada letra a 0}        
-        end;
-end;
-procedure iniciarOracion(var ora : array of Texto);
-    { Inicializa la oración `ora` con 10 nodos, cada uno apuntando al siguiente.
-    { Inicializa la oración a nil. }
-    var 
-        i : integer;
-begin
-    {inicializar ora; ora[1]^.sig := ora[2];}
-    i := 1;
-    {inicializar el primer nodo de ora}
-    new(ora[0]);
-    for i in [1..9] do
-    begin
-        new(ora[i]);
-        ora[i - 1]^.sig := ora[i];        
-    end;
-    ora[9]^.sig := nil; {el último nodo apunta a nil}
-end;
-procedure newTexto(var tex : Texto; t: array of char);
-begin
-    new(tex); {crear un nuevo nodo}
-    { Inicializa el texto `tex` con una palabra formada por los caracteres de `t`. }
-    initPalabra(t, tex^.info);
-    tex^.sig := nil; {inicializa el siguiente nodo a nil}    
-end;
-procedure addTexto(var tex : Texto; t: array of char);
-    var
-        nuevo : Texto;
-        puntero: texto;
-begin
-    newTexto(nuevo, t); {inicializar el nuevo nodo con la palabra t}
-    {encontrar el último nodo de la lista}
-    puntero := tex;
-    while puntero^.sig <> nil do
-        puntero := puntero^.sig; {avanzar al siguiente nodo}
-    end;
-    puntero^.sig := nuevo; {agregar el nuevo nodo al final de la lista}
-end;
+    repeat
+        writeLn;
+        writeln('----- MENÚ TAREA2 -----');
+        writeln('1. Pascrabble ');
+        writeln('2. Probar subprogramas individualmente ');
+        writeln('0. Salir');
+        writeln('------------------------');
+        write('Seleccione una opción: ');
+        readln(opcion);
+        writeln;
 
-{
-type
+        case opcion of
+            1 : begin // Pascrabble
+                Randomize;
 
-   Letra        = 'a' .. 'z';
-   Palabra	= record
-      cadena : array [1 .. MAXPAL] of Letra;
-      tope   : 0 .. MAXPAL
-   end;
+                inicializarTablero(tab);
+                jugadas := NIL;
+                puntaje := 0;
+                writeln('Bienvenido al PAScrabble');
+                writeln;
 
-   Histograma =  array [Letra] of integer;
+                leerDiccionario(dicc);
+                calcularHistogramaTexto(dicc, hist);
+                calcularPuntajes(hist, info);
+                llenarBolsaFichas(info, bolsa);
+                iniciarAtril(mano);
+                // reponerFichas(bolsa, mano);
 
-   InfoFicha = record
-      puntaje : integer;
-      cantidad : integer;
-   end;
+                mostrarTablero(tab);
+                mostrarAtril(mano, info);
+                writeln('Puntaje total: ', puntaje:0);
+                repeat 
+                    writeln;
+                    writeln('----- MENÚ PASCRABBLE -----');
+                    writeln('1. Mostrar tablero');
+                    writeln('2. Mostrar historial de jugadas');
+                    writeln('3. Mostrar puntajes de letras');
+                    writeln('4. Mostrar atril');
+                    writeln('5. Jugar una palabra');
+                    writeln('6. Reponer fichas');
+                    writeln('7. Consultar palabra');
+                    writeln('0. Salir');
+                    write('Seleccione una opción: ');
+                    readln(opcionPascrabble);
 
-   InfoFichas = array[Letra] of InfoFicha;
+                    writeln;
 
-   TipoBonus = (Ninguno, DobleLetra, TriplePalabra, Trampa);
+                    case opcionPascrabble of
+                        1: begin
+                            mostrarTablero(tab);
+                            mostrarAtril(mano, info);
+                            writeln('Puntaje total: ', puntaje:0);
+                        end;
 
-   Casillero = record
-      bonus : TipoBonus;
-      case ocupada : boolean of
-         true : (ficha : Letra);
-         false : (); 
-   end;
+                        2 : MostrarHistorial(jugadas);
 
-   Tablero = array['A'..MAXFILAS, 1..MAXCOLUMNAS] of Casillero;
+                        3: begin
+                            writeln('Puntajes de letras:');
+                            mostrarPuntajes(info);
+                        end;
 
-   TipoDireccion = (Horizontal, Vertical);
-   Posicion = record
-      direccion : TipoDireccion;
-      fila : 'A'..MAXFILAS;
-      col  : 1..MAXCOLUMNAS;
-   end;
+                        4: mostrarAtril(mano, info);
 
+                        5: begin
+                            ingresarPalabra(pal, pos);
+                            intentarArmarPalabra(pal, pos, tab, mano, dicc, info, resu);
+                            case resu.tipo of
+                                NoEntra: writeln('La palabra no entra en el tablero.');
+                                NoFichas: writeln('No hay fichas en el atril y tablero para armar la palabra.');
+                                NoExiste: writeln('La palabra no existe en el diccionario.');
+                                Valida: begin
+                                    registrarJugada(jugadas, pal, pos, resu.puntaje);
+                                    puntaje := puntaje + resu.puntaje;
+                                    write('Palabra armada "');mostrarPalabra(pal);writeln('" suma ', resu.puntaje:0, ' puntos.');
+                                    mostrarTablero(tab);
+                                    mostrarAtril(mano, info);
+                                end;
+                            end;
+                        end;
 
-   BolsaFichas = record
-      letras : array[1..TOTALFICHAS] of Letra;
-      tope : 0 .. TOTALFICHAS;
-   end;
+                        6: begin
+                            reponerFichas(bolsa, mano);
+                            mostrarTablero(tab);
+                            mostrarAtril(mano, info);
+                            writeln('Puntaje total: ', puntaje:0);
+                        end;
 
-   Atril = record
-      letras : array[1..MAXATRIL] of Letra;
-      tope : 0 .. MAXATRIL;
-   end;
+                        7: begin
+                            writeln('Ingrese la palabra a consultar:');
+                            leerPalabra(input, pal);
+                            if esPalabraValida(pal, dicc) then
+                                writeln('La palabra está en el diccionario.')
+                            else
+                                writeln('La palabra NO está en el diccionario.');
+                        end;
 
-   Texto	= ^NodoPal; 
-   NodoPal	= record  
-      info : Palabra;
-      sig  : Texto
-   end;
+                        0: begin
+                            writeln('Saliendo del juego.');
+                            liberarTexto(dicc);
+                            borrarHistorial(jugadas);
+                        end;
 
-   TipoResultado = (Valida, NoEntra, NoFichas, NoExiste);
+                    else
+                        writeln('Opción inválida. Intente nuevamente.');
+                    end;
 
-   ResultadoJugada = record
-      palabra : Palabra;
-      pos : Posicion;
-      case tipo : TipoResultado of
-         Valida : (puntaje : integer);
-         NoEntra : ();
-         NoFichas : ();
-         NoExiste  : ();
-   end;
+                until opcionPascrabble = 0;
+            end;
+            2: begin // Probar subprogramas individualmente
+                    repeat
+                    writeln('----- MENÚ PROBAR SUBPROGRAMAS -----');
+                    writeln('1. Calcular histograma palabra ');
+                    writeln('2. Comparar palabras ');
+                    writeln('3. Calcular histograma texto ');
+                    writeln('4. Es palabra válida ');
+                    writeln('5. Remover letra del atril ');
+                    writeln('6. Entra en tablero ');
+                    writeln('7. Siguiente posición ');
+                    writeln('8. Puede armar palabra ');
+                    writeln('9. Armar palabra ');
+                    writeln('10. Registrar jugada ');
+                    writeln('0. Salir ');
+                    writeln('------------------------');
+                    write('Seleccione una opción: ');
+                    readln(opcionTests);
+                    writeln;
+                    case opcionTests of
+                        1: begin // Calcular histograma palabra
+                            writeln('Ingrese la palabra a calcular el histograma:');
+                            leerPalabra(input, pal);
+                            calcularHistograma(pal, hist);
+                            mostrarHistograma(hist);
+                        end;
+                        2: begin // Comparar palabras
+                            writeln('Ingrese la primera palabra a comparar:');
+                            leerPalabra(input, pal);
+                            writeln('Ingrese la segunda palabra a comparar:');
+                            leerPalabra(input, pal2);
+                            if iguales(pal, pal2) then
+                                writeln('Las palabras son iguales.')
+                            else
+                                writeln('Las palabras son diferentes.');
+                        end;
+                        3: begin // Calcular histograma texto
+                            leerDiccionario(dicc);
+                            calcularHistogramaTexto(dicc, hist);
+                            mostrarHistograma(hist);
+                            liberarTexto(dicc);
+                        end;
+                        4: begin // Es palabra válida
+                            leerDiccionario(dicc);
+                            writeln('Ingrese la palabra a consultar:');
+                            leerPalabra(input, pal);
+                            if esPalabraValida(pal, dicc) then
+                                writeln('La palabra está en el diccionario.')
+                            else
+                                writeln('La palabra NO está en el diccionario.');
+                            liberarTexto(dicc);
+                        end;
+                        5: begin // Remover letra del atril
+                            rellenarAtril(mano);
+                            writeln('Ingrese una letra a remover del atril:');
+                            readln(l);
+                            removerLetraAtril(mano, l);
+                            mostrarAtril(mano, info);
+                        end;
+                        6: begin // Entra en tablero 
+                            inicializarTablero(tab);
+                            mostrarTablero(tab);
+                            ingresarPalabra(pal, pos);
+                            if entraEnTablero(pal, pos) then
+                                writeln('La palabra entra en el tablero.')
+                            else
+                                writeln('La palabra NO entra en el tablero.');
+                        end;
+                        7: begin // Siguiente posición
+                            writeln('Ingrese una posición:');
+                            leerPosicion(pos);
+                            siguientePosicion(pos);
+                            writeln('Siguiente posición:');
+                            imprimirPosicion(pos);
+                            writeln
+                        end;
+                        8: begin // Puede armar palabra
+                            rellenarAtril(mano);
+                            inicializarTablero(tab);
+                            leerLetrasTablero(tab);
+                            mostrarAtril(mano, info);
+                            ingresarPalabra(pal, pos);
+                            if puedeArmarPalabra(pal, pos, mano, tab) then
+                                writeln('Se puede armar la palabra.')
+                            else
+                                writeln('NO se puede armar la palabra.');
+                        end;
+                        9: begin // Armar palabra
+                            leerDiccionario(dicc);
+                            calcularHistogramaTexto(dicc, hist);
+                            calcularPuntajes(hist, info);
+                            rellenarAtril(mano);
+                            inicializarTablero(tab);
+                            leerLetrasTablero(tab);
+                            mostrarAtril(mano, info);
+                            ingresarPalabra(pal, pos);
 
-   HistorialJugadas = ^NodoJugada;
-   NodoJugada = record
-      palabra : Palabra;
-      pos : Posicion;
-      puntaje : integer;
-      sig : HistorialJugadas
-   end;
-}
-procedure calcularHistograma(pal : Palabra; var hist : Histograma);
-    { Retorna en `hist` el histograma de `pal`, es decir la cantidad
-    de ocurrencias de cada letra en esa palabra.
-    No se puede asumir el estado inicial de histograma. }
-
-    var 
-        i : integer;
-begin
-        {recorrer cada letra de la palabra}
-        for i := 1 to pal.tope do
-        begin
-            {si la letra de la palabra es igual a la letra del histograma}
-            if pal.cadena[i] in ['a'..'z'] then
-            begin
-                {incrementar el contador de esa letra en el histograma}
-                hist[pal.cadena[i]] := hist[pal.cadena[i]] + 1;
+                            intentarArmarPalabra(pal, pos, tab, mano, dicc, info, resu);
+                            write('Se intentó armar la palabra: ');
+                            mostrarPalabra(resu.palabra);
+                            writeln;
+                            write('En la posición: ');
+                            imprimirPosicion(resu.pos);
+                            writeln;
+                            case resu.tipo of
+                                NoEntra: writeln('La palabra no entra en el tablero.');
+                                NoFichas: writeln('No hay fichas en el atril y tablero para armar la palabra.');
+                                NoExiste: writeln('La palabra no existe en el diccionario.');
+                                Valida: begin
+                                    write('Palabra armada "');mostrarPalabra(pal);writeln('" suma ', resu.puntaje:0, ' puntos.');
+                                    mostrarTablero(tab);
+                                    mostrarAtril(mano, info);
+                                end;
+                            end;
+                            liberarTexto(dicc);
+                        end;
+                        10: begin // Registrar jugada
+                            writeln('Ingrese la cantidad de jugadas a registrar:');
+                            readln(num);
+                            jugadas := NIL;
+                            for i := 1 to num do
+                            begin
+                                ingresarPalabra(pal, pos);
+                                writeln('Ingrese el puntaje de la jugada:');
+                                readln(puntaje);
+                                registrarJugada(jugadas, pal, pos, puntaje);
+                                writeln;
+                            end;
+                            MostrarHistorial(jugadas);
+                            borrarHistorial(jugadas);
+                        end;
+                    end;
+                until opcionTests = 0;
             end;
         end;
-end;
-
-function iguales(pal1, pal2 : Palabra) : boolean;
-    { Dadas dos palabras, `pa1` y `pal2`, verifica si son iguales. Devolver con iguales:=}
-    {Asumiremos que las palabras serán formateadas antes de llamar a iguales}
-    var 
-        i : integer;
-        igual : boolean;
-begin
-    {mostrar palabra 1 y palabra 2}
-    if pal1.tope <> pal2.tope then
-    begin
-        igual := false;
-    end
-    else
-    begin
-        i := 1;
-        igual := true;
-        while (i <= pal1.tope) and igual do
-        begin
-            if pal1.cadena[i] <> pal2.cadena[i] then
-                igual := false;
-            i := i + 1;
-        end;
-        i:= i-1; { Ajustar i para que no se salga del rango }
-    end;
-    { Devolver el resultado de la comparación }
-    iguales := igual and (i<=pal1.tope);
-end;
-
-procedure calcularHistogramaTexto(tex : Texto; var hist : Histograma);
-    { Retorna en `hist` la cantidad de ocurrencias de cada letra en el texto `tex`.
-    No se puede asumir el estado inicial de `hist`. }
-begin
-    {recorrer el texto hasta que sea nulo}
-    while tex <> nil do
-    begin
-        {calcular el histograma de la palabra}
-        calcularHistograma(tex^.info, hist);
-        {avanzar al siguiente nodo del texto}
-        tex := tex^.sig;
-    end;
-end;
-
-function esPalabraValida(pal : Palabra; dicc : Texto) : boolean;
-    { Dada una palabra `pal` y un diccionario `dicc`, verifica si la palabra
-    está en el texto dicc. }
-    var 
-        bandera : boolean;
-begin
-    bandera := true; {inicializar bandera a true}
-    esPalabraValida := false; {la palabra no es válida por defecto}
-    {recorrer el diccionario hasta que sea nulo}
-    while (dicc <> nil) and bandera do
-    begin
-        {si la palabra es igual a la palabra del diccionario}
-        if iguales(pal, dicc^.info) then
-        begin
-            esPalabraValida := true; {la palabra es válida}
-            bandera := false; {salir del bucle}
-        end
-        else
-            {avanzar al siguiente nodo del diccionario}
-            dicc := dicc^.sig;
-    end;
-end;
-
-procedure removerLetraAtril(var mano : Atril; let : char);
-    { Dada una letra `let`, elimina la primera aparición de esta
-    del atril y deja a su lugar la última letra del atril.
-    Se asume que la letra está en el atril. }
-    var 
-        i, pos : integer;
-begin
-    pos := -1; {inicializar posición a -1}
-    {buscar la letra en el atril}
-    i:=1; 
-    while (pos = -1) and (i <= mano.tope) do
-    begin
-        if mano.letras[i] = let then
-        begin
-            pos := i; {guardar la posición de la letra}
-        end;
-        i := i + 1; {avanzar al siguiente índice}
-    end;
-    {si se encontró la letra}
-    if pos <> -1 then
-    begin
-        mano.letras[pos] := mano.letras[mano.tope]; {reemplazar la letra por la última}
-        mano.tope := mano.tope - 1; {disminuir el tope del atril}
-    end;
-end;
-
-function entraEnTablero(pal : Palabra; pos : Posicion) : boolean;
-    { Verifica si la palabra `pal` entra en el tablero a partir de la posición `pos`,
-    teniendo en cuenta que no debe salirse de los límites del tablero. }
-begin
-    { Verificar si la palabra entra en el tablero según la dirección }
-    if pos.direccion = Horizontal then
-        { Verificar si la palabra cabe en la fila indicada }
-        entraEnTablero := (pos.col + pal.tope - 1 <= MAXCOLUMNAS)
-    else
-        { Verificar si la palabra cabe en la columna indicada }
-        entraEnTablero := (ord(pos.fila) + pal.tope - 1 <= ord(MAXFILAS));
-end;
-
-procedure siguientePosicion(var pos : Posicion);
-    { Actualiza la posición `pos`, devuelve en la misma variable la posición del 
-    siguiente casillero en la dirección indicada en `pos`. 
-    Se asume que `pos` no corresponde a la última fila si la dirección es vertical, 
-    ni a la última columna si la dirección es horizontal. }
-begin
-    { Actualizar la posición según la dirección }
-    if pos.direccion = Horizontal then
-        pos.col := pos.col + 1 { Avanzar a la siguiente columna }
-    else
-        pos.fila := chr(ord(pos.fila) + 1); { Avanzar a la siguiente fila }
-end;
-
-function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero) : boolean;
-    { Verifica que la palabra `pal` puede armarse a partir de la posición `pos`, 
-    considerando las letras disponibles en el atril y en el tablero (respetando su ubicación).
-    Se puede asumir que la palabra entra en el tablero. }
-    var 
-        i, j : integer;
-        booleano : boolean;
-begin
-    {compruebo si entra en el tablero}
-    if not entraEnTablero(pal, pos) then
-        puedeArmarPalabra := false {no entra en el tablero}
-    else
-    begin
-        {inicializar la variable de retorno a true}
-        puedeArmarPalabra := true;
-        {recorrer cada letra de la palabra}
-        i:= 1; {inicializar el índice de la palabra}
-        booleano := true; {inicializar la variable booleana a true}
-        while (i <=pal.tope) and (booleano) do
-        begin
-            {si la letra de la celda está en el tablero y no en la palabra}
-            if (tab[pos.fila, pos.col].ocupada) and (tab[pos.fila, pos.col].ficha <> pal.cadena[i]) then
-            begin
-                booleano := false;
-                puedeArmarPalabra := booleano; {no se puede armar la palabra}
-            end
-            else
-            j:= 1;
-            booleano := false; {inicializar la variable booleana a false}
-            while (j <= mano.tope) and not booleano do
-            begin
-                if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
-                    booleano := true;
-                {letra, atril y booleano}
-                puedeArmarPalabra := booleano;
-                j:= j + 1;
-            end;
-            siguientePosicion(pos); {avanzar a la siguiente posición}
-            i := i + 1; {avanzar al siguiente índice de la palabra}
-        end;
-        
-    end;
-
-end;
-
-procedure intentarArmarPalabra(pal : Palabra; pos : Posicion; 
-                              var tab : Tablero; var mano : Atril; 
-                              dicc : Texto; info : InfoFichas; 
-                              var resu : ResultadoJugada);
-    { Dada una palabra, posición, tablero, atril, diccionario, info y un resultado.}
-    { En primer lugar, se verifica que la palabra entre en el tablero dada la posición. }
-    { Luego que se pueda armar la palabra en el tablero con las fichas disponibles }
-    { y por último que la palabra exista en el diccionario. }
-    { Si es posible armar la palabra, esta se agrega en el tablero, actualiza `resu.tipo` y 
-    almacena el puntaje en `resu.puntaje`.
-    Para calcular el puntaje, se suman los puntos de las letras **agregadas**, utilizando 
-    la información de `info` y la bonificación del casillero. Tanto para el puntaje calculado
-    como para las bonificaciones **NO** suman las letras ya existentes en el tablero que conforman la palabra. 
-    Si no se puede armar la palabra, devuelve el resultado correspondiente en `resu.tipo`. }
-    var 
-        i : integer;
-        b: boolean;
-begin
-    b:= true;
-    { Verificar si la palabra entra en el tablero }
-    if not entraEnTablero(pal, pos) then
-    begin
-        resu.tipo := NoEntra; {la palabra no entra en el tablero}
-        b:= false; {no se puede armar la palabra}
-    end;
-
-    { Verificar si se puede armar la palabra }
-    if not puedeArmarPalabra(pal, pos, mano, tab) then
-    begin
-        resu.tipo := NoFichas; {no se pueden armar las fichas}
-        b:= false; {no se puede armar la palabra}
-    end;
-
-    { Verificar si la palabra es válida }
-    if not esPalabraValida(pal, dicc) then
-    begin
-        resu.tipo := NoExiste; {la palabra no existe en el diccionario}
-        b:= false; {no se puede armar la palabra}
-    end;
-    if b then
-    begin{ Si llega hasta aquí, la palabra es válida y se puede armar }
-        resu.tipo := Valida;
-        resu.palabra := pal;
-        resu.pos := pos; 
-        { Calcular el puntaje de la jugada }
-        resu.puntaje := 0;
-        
-        for i in [1..pal.tope] do
-        begin
-            if not (tab[pos.fila, pos.col].ocupada) then
-                {a resultado le sumamos info del encabezado}
-                resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
-            siguientePosicion(pos); {avanzar a la siguiente posición}
-        end;
-    end;
-end;
-
-procedure registrarJugada(var jugadas : HistorialJugadas; pal : Palabra; pos : Posicion; puntaje : integer);
-    { Dada una lista de jugadas, una palabra, Posicion y puntaje, agrega la jugada al final de la lista }
-    var 
-        nuevaJugada : HistorialJugadas;
-        aux : HistorialJugadas;
-begin
-    new(nuevaJugada); {crear un nuevo nodo}
-    nuevaJugada^.palabra := pal; {asignar la palabra}
-    nuevaJugada^.pos := pos; {asignar la posición}
-    nuevaJugada^.puntaje := puntaje; {asignar el puntaje}
-    nuevaJugada^.sig := nil; {inicializar el siguiente nodo a nil}
-
-    if jugadas = nil then
-        jugadas := nuevaJugada {si la lista está vacía, asignar la nueva jugada como la primera}
-    else
-    begin
-        aux := jugadas;
-        while aux^.sig <> nil do
-            aux := aux^.sig; {avanzar al final de la lista}
-        aux^.sig := nuevaJugada; {agregar la nueva jugada al final de la lista}
-    end;
-end;
+    until opcion = 0;
+end.
