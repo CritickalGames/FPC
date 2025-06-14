@@ -140,17 +140,21 @@ procedure calcularHistograma(pal : Palabra; var hist : Histograma);
 
     var 
         i : integer;
+        c: Letra;
 begin
-        {recorrer cada letra de la palabra}
-        for i := 1 to pal.tope do
+    {iniicializar el histograma a cero}
+    for c in ['a'..'z'] do
+        hist[c] := 0; {inicializar el contador de cada letra a 0}
+    {recorrer cada letra de la palabra}
+    for i := 1 to pal.tope do
+    begin
+        {si la letra de la palabra es igual a la letra del histograma}
+        if pal.cadena[i] in ['a'..'z'] then
         begin
-            {si la letra de la palabra es igual a la letra del histograma}
-            if pal.cadena[i] in ['a'..'z'] then
-            begin
-                {incrementar el contador de esa letra en el histograma}
-                hist[pal.cadena[i]] := hist[pal.cadena[i]] + 1;
-            end;
+            {incrementar el contador de esa letra en el histograma}
+            hist[pal.cadena[i]] := hist[pal.cadena[i]] + 1;
         end;
+    end;
 end;
 
 function iguales(pal1, pal2 : Palabra) : boolean;
@@ -180,14 +184,26 @@ end;
 procedure calcularHistogramaTexto(tex : Texto; var hist : Histograma);
     { Retorna en `hist` la cantidad de ocurrencias de cada letra en el texto `tex`.
     No se puede asumir el estado inicial de `hist`. }
+    var
+        h: Histograma;
+        c: Letra;
 begin
+    {inicializar el histograma a cero}
+    inicializarHistograma(h);
+    //!{ limpiar el histograma hist:= h; da error}
+    {limpia el histograma}
+    for c in ['a'..'z'] do
+        hist[c] := 0; {inicializar el contador de cada letra a 0}
     {recorrer el texto hasta que sea nulo}
     while tex <> nil do
     begin
         {calcular el histograma de la palabra}
-        calcularHistograma(tex^.info, hist);
+        calcularHistograma(tex^.info, h);
         {avanzar al siguiente nodo del texto}
         tex := tex^.sig;
+        {sumar h a histo}
+        for c in ['a'..'z'] do
+            hist[c] := hist[c] + h[c];
     end;
 end;
 

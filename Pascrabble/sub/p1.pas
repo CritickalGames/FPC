@@ -23,9 +23,9 @@ end;
 
 var 
    i: integer;
-   his: Histograma;
+   hist: Histograma;
    c: Char;
-   p1: Palabra;
+   p1, pal: Palabra;
    p2: Palabra;
    ora: array[1..10] of Texto;
    dicc: Texto;
@@ -38,40 +38,21 @@ var
    jugadas : HistorialJugadas;
 begin
    //TODO inicializar variables
-   // inicializarTablero(tab);
-   // {iniciar diccionario}
-   // dicc := crearDiccionario();
-   // {inicializar fichas en 0}
-   // for c := 'a' to 'z' do
-   // begin
-   //    fichas[c].cantidad := 1;
-   //    fichas[c].puntaje := 2;
-   // end;
-   // {inicializa la posición}
-   // pos.direccion := Horizontal;
-   // pos.fila := 'A';
-   // pos.col := 1;
-   // {inicializar p1}
-   // initPalabra(['h', 'o', 'l', 'a'], p1);
-   // {iniciar y rellenar atril con fichas}
-   // iniciarAtril(mano);
-   // rellenarAtril(mano);
-   // //Todo Mostrar
-   // {Mostrar Tablero}
-   // mostrarTablero(tab);
-   // {mostrar mostrarAtril}
-   // mostrarAtril(mano, fichas);
+   {inicializar el histograma a cero}
+   for c := 'a' to 'z' do
+      hist[c] := 0;
    //TODO operar
-   {(
-      var jugadas : HistorialJugadas; pal : Palabra; pos : Posicion; puntaje : integer
-   )}
-   {inicializar p1 y p2}
-   initPalabra(['h', 'o', 'l', 'a'], p1);
-   initPalabra(['h', 'o', 'l', 's'], p2);
-   {comparar p1 y p2}
-   booleano := iguales(p1, p2);
-   writeln('Las palabras son iguales: ', booleano);
-
+   rellenarAtril(mano);
+   inicializarTablero(tab);
+   leerLetrasTablero(tab);
+   mostrarAtril(mano, fichas);
+   ingresarPalabra(pal, pos);
+   if puedeArmarPalabra(pal, pos, mano, tab) then
+      writeln('Se puede armar la palabra.')
+   else
+      writeln('NO se puede armar la palabra.');
+   readln(c);
+   {Hipotesis: PuedeArmarPalabra no comprueba si el espacio está ocupado por una ficha.}
 end.
 
 {
