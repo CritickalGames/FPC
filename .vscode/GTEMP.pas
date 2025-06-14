@@ -309,18 +309,20 @@ begin
                 puedeArmarPalabra := booleano; {no se puede armar la palabra}
             end
             else
-            j:= 1;
-            booleano := false; {inicializar la variable booleana a false}
-            while (j <= mano.tope) and not booleano do
             begin
-                if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
-                    booleano := true;
-                {letra, atril y booleano}
-                puedeArmarPalabra := booleano;
-                j:= j + 1;
+                j:= 1;
+                booleano := false; {inicializar la variable booleana a false}
+                while (j <= mano.tope) and not booleano do
+                begin
+                    if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
+                        booleano := true;
+                    {letra, atril y booleano}
+                    puedeArmarPalabra := booleano;
+                    j:= j + 1;
+                end;
+                siguientePosicion(pos); {avanzar a la siguiente posición}
+                i := i + 1; {avanzar al siguiente índice de la palabra}
             end;
-            siguientePosicion(pos); {avanzar a la siguiente posición}
-            i := i + 1; {avanzar al siguiente índice de la palabra}
         end;
         
     end;
