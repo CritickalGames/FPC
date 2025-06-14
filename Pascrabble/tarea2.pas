@@ -351,6 +351,7 @@ begin
     { Verificar si la palabra entra en el tablero }
     if not entraEnTablero(pal, pos) then
     begin
+        { Si la palabra no entra en el tablero, se actualiza el resultado }
         resu.tipo := NoEntra; {la palabra no entra en el tablero}
         b:= false; {no se puede armar la palabra}
     end;
@@ -358,6 +359,7 @@ begin
     { Verificar si se puede armar la palabra }
     if not puedeArmarPalabra(pal, pos, mano, tab) then
     begin
+        { Si no se pueden armar las fichas, se actualiza el resultado }
         resu.tipo := NoFichas; {no se pueden armar las fichas}
         b:= false; {no se puede armar la palabra}
     end;
@@ -365,6 +367,7 @@ begin
     { Verificar si la palabra es válida }
     if not esPalabraValida(pal, dicc) then
     begin
+        { Si la palabra no existe en el diccionario, se actualiza el resultado }
         resu.tipo := NoExiste; {la palabra no existe en el diccionario}
         b:= false; {no se puede armar la palabra}
     end;
@@ -379,8 +382,14 @@ begin
         for i in [1..pal.tope] do
         begin
             if not (tab[pos.fila, pos.col].ocupada) then
+            begin
+                { Si la letra no está ocupada, se agrega al tablero y se suma el puntaje }
                 {a resultado le sumamos info del encabezado}
                 resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
+                {agregar la letra al tablero}
+                tab[pos.fila, pos.col].ocupada := true; {marcar el casillero como ocupado}
+                tab[pos.fila, pos.col].ficha := pal.cadena[i]; {asignar la letra al casillero}
+            end;
             siguientePosicion(pos); {avanzar a la siguiente posición}
         end;
     end;

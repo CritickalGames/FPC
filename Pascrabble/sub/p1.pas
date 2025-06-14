@@ -18,6 +18,8 @@ begin
    addTexto(dicc, ['e', 'j', 'e', 'm', 'p', 'l', 'o']);
    addTexto(dicc, ['d', 'i', 'c', 'c', 'i', 'o', 'n', 'a', 'r', 'i', 'o']);
    addTexto(dicc, ['p', 'a', 'l', 'a', 'b', 'r', 'a']);
+   {palabra mesa}
+   addTexto(dicc, ['m', 'e', 's', 'a']);
    crearDiccionario := dicc; {inicializar el diccionario a nil}
 end;
 
@@ -38,20 +40,42 @@ var
    jugadas : HistorialJugadas;
 begin
    //TODO inicializar variables
+   {inicializar el diccionario}
+   dicc := crearDiccionario();
    {inicializar el histograma a cero}
    for c := 'a' to 'z' do
       hist[c] := 0;
    //TODO operar
-   rellenarAtril(mano);
+   {while c <> "q"}
+   c:='a';
    inicializarTablero(tab);
-   leerLetrasTablero(tab);
-   mostrarAtril(mano, fichas);
-   ingresarPalabra(pal, pos);
-   if puedeArmarPalabra(pal, pos, mano, tab) then
-      writeln('Se puede armar la palabra.')
-   else
-      writeln('NO se puede armar la palabra.');
-   readln(c);
+
+   while c <> 'q' do
+   begin
+      rellenarAtril(mano);
+      mostrarTablero(tab);
+      mostrarAtril(mano, fichas);
+      ingresarPalabra(pal, pos);
+      if puedeArmarPalabra(pal, pos, mano, tab) then
+      begin
+         writeln('Se puede armar la palabra.');
+         {intentarArmarPalabra(pal : Palabra; pos : Posicion; 
+                              var tab : Tablero; var mano : Atril; 
+                              dicc : Texto; info : InfoFichas; 
+                              var resu : ResultadoJugada)}
+         mostrarTablero(tab);
+         intentarArmarPalabra(pal, pos, tab, mano, dicc, fichas, resu);
+      end
+      else
+         writeln('NO se puede armar la palabra.');
+      {recorer tablero y mostrar las letras ocupadas}
+      writeln('Letras ocupadas en el tablero:');
+      for i := 1 to MAXCOLUMNAS do
+         for c := 'A' to MAXFILAS do
+            if tab[c, i].ocupada then
+               writeln('Fila: ', c, ' Columna: ', i, ' Letra: ', tab[c, i].ficha);
+      readln(c);
+   end;
    {Hipotesis: PuedeArmarPalabra no comprueba si el espacio está ocupado por una ficha.}
 end.
 
