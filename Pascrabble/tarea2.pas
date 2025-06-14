@@ -315,11 +315,15 @@ begin
                 while (j <= mano.tope) and not booleano do
                 begin
                     if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
-                        booleano := true;
+                    begin
+                        booleano := true; {Si es True, sale del bucle }
+                        {eliminar la letra del atril}
+                        removerLetraAtril(mano, pal.cadena[i]); {remover la letra del atril}
+                    end;
                     {letra, atril y booleano}
-                    puedeArmarPalabra := booleano;
                     j:= j + 1;
                 end;
+                puedeArmarPalabra := booleano;
                 siguientePosicion(pos); {avanzar a la siguiente posición}
                 i := i + 1; {avanzar al siguiente índice de la palabra}
             end;
