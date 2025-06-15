@@ -277,9 +277,11 @@ procedure siguientePosicion(var pos : Posicion);
 begin
     { Actualizar la posición según la dirección }
     if pos.direccion = Horizontal then
-        pos.col := pos.col + 1 { Avanzar a la siguiente columna }
+        if pos.col <> MAXCOLUMNAS then
+            pos.col := pos.col + 1 { Avanzar a la siguiente columna }
     else
-        pos.fila := chr(ord(pos.fila) + 1); { Avanzar a la siguiente fila }
+        if pos.fila <> MAXFILAS then
+            pos.fila := chr(ord(pos.fila) + 1); { Avanzar a la siguiente fila }
 end;
 
 function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero) : boolean;
@@ -302,31 +304,34 @@ begin
         booleano := true; {inicializar la variable booleana a true}
         while (i <=pal.tope) and (booleano) do
         begin
-            {si la letra de la celda está en el tablero y no en la palabra}
-            if (tab[pos.fila, pos.col].ocupada) and (tab[pos.fila, pos.col].ficha <> pal.cadena[i]) then
+            {not: si la posición está ocupada y la ficha[i] != cadena[i]}
+            booleano := not (tab[pos.fila, pos.col].ocupada and (tab[pos.fila, pos.col].ficha <> pal.cadena[i]));
+            if booleano  then
             begin
-                booleano := false;
-                puedeArmarPalabra := booleano; {no se puede armar la palabra}
-            end
-            else
-            begin
+                while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
+                begin
+                    siguientePosicion(pos);
+                    i:=i+1;
+                end;
                 j:= 1;
-                booleano := false; {inicializar la variable booleana a false}
-                while (j <= mano.tope) and not booleano do
+                booleano := false;
+                while (j <= mano.tope) and not booleano do {Si booleano es True, sale del bucle }
                 begin
                     if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
-                    begin
-                        booleano := true; {Si es True, sale del bucle }
+                    begin                        
+                        booleano := true;
                         {eliminar la letra del atril}
                         removerLetraAtril(mano, pal.cadena[i]); {remover la letra del atril}
                     end;
                     {letra, atril y booleano}
                     j:= j + 1;
                 end;
-                puedeArmarPalabra := booleano;
                 siguientePosicion(pos); {avanzar a la siguiente posición}
                 i := i + 1; {avanzar al siguiente índice de la palabra}
             end;
+            
+            puedeArmarPalabra := booleano; {no se puede armar la palabra}
+            
         end;
         
     end;
@@ -375,6 +380,7 @@ begin
         resu.tipo := NoExiste; {la palabra no existe en el diccionario}
         b:= false; {no se puede armar la palabra}
     end;
+    
     if b then
     begin{ Si llega hasta aquí, la palabra es válida y se puede armar }
         resu.tipo := Valida;

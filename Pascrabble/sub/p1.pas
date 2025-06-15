@@ -18,8 +18,9 @@ begin
    addTexto(dicc, ['e', 'j', 'e', 'm', 'p', 'l', 'o']);
    addTexto(dicc, ['d', 'i', 'c', 'c', 'i', 'o', 'n', 'a', 'r', 'i', 'o']);
    addTexto(dicc, ['p', 'a', 'l', 'a', 'b', 'r', 'a']);
-   {palabra mesa}
+   {palabra mesa, amores}
    addTexto(dicc, ['m', 'e', 's', 'a']);
+   addTexto(dicc, ['a', 'm', 'o', 'r', 'e','s']);
    crearDiccionario := dicc; {inicializar el diccionario a nil}
 end;
 
@@ -49,11 +50,20 @@ begin
    {while c <> "q"}
    c:='a';
    inicializarTablero(tab);
-
+   {iniciar tab en i1a i2m i3o i4r}
+   tab['I',1].ocupada:=true;
+   tab['I',1].ficha:='a';
+   tab['I',2].ocupada:=true;
+   tab['I',2].ficha:='m';
+   tab['I',3].ocupada:=true;
+   tab['I',3].ficha:='o';
+   tab['I',4].ocupada:=true;
+   tab['I',4].ficha:='r';
    while c <> 'q' do
    begin
       rellenarAtril(mano);
       mostrarTablero(tab);
+      //leerLetrasTablero(tab);
       mostrarAtril(mano, fichas);
       ingresarPalabra(pal, pos);
       if puedeArmarPalabra(pal, pos, mano, tab) then
@@ -68,12 +78,6 @@ begin
       end
       else
          writeln('NO se puede armar la palabra.');
-      {recorer tablero y mostrar las letras ocupadas}
-      writeln('Letras ocupadas en el tablero:');
-      for i := 1 to MAXCOLUMNAS do
-         for c := 'A' to MAXFILAS do
-            if tab[c, i].ocupada then
-               writeln('Fila: ', c, ' Columna: ', i, ' Letra: ', tab[c, i].ficha);
       readln(c);
    end;
    {Hipotesis: PuedeArmarPalabra no comprueba si el espacio está ocupado por una ficha.}
