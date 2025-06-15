@@ -4,6 +4,7 @@ program principal;
 
 { Con esta directiva queda incluido el archivo tarea2.pas }
 {$INCLUDE ../tarea2.pas}
+{$INCLUDE t.pas}
 
 function crearDiccionario():Texto;
    var
@@ -61,28 +62,33 @@ begin
    tab['I',4].ficha:='r';
    while c <> 'q' do
    begin
-      // rellenarAtril(mano);
-      // mostrarTablero(tab);
-      // //leerLetrasTablero(tab);
-      // mostrarAtril(mano, fichas);
-      // ingresarPalabra(pal, pos);
-      // if puedeArmarPalabra(pal, pos, mano, tab) then
-      // begin
-      //    writeln('Se puede armar la palabra.');
-      //    {intentarArmarPalabra(pal : Palabra; pos : Posicion; 
-      //                         var tab : Tablero; var mano : Atril; 
-      //                         dicc : Texto; info : InfoFichas; 
-      //                         var resu : ResultadoJugada)}
-      //    mostrarTablero(tab);
-      //    intentarArmarPalabra(pal, pos, tab, mano, dicc, fichas, resu);
-      // end
-      // else
-      //    writeln('NO se puede armar la palabra.');
-      leerPosicion(pos);
-      siguientePosicion(pos);
-      writeln('Siguiente posición:');
-      imprimirPosicion(pos);
-      writeLn;
+      // leerDiccionario(dicc);
+      calcularHistogramaTexto(dicc, hist);
+      calcularPuntajes(hist, info);
+      rellenarAtril(mano);
+      // inicializarTablero(tab);
+      leerLetrasTablero(tab);
+      mostrarAtril(mano, info);
+      ingresarPalabra(pal, pos);
+
+      intentarArmarPalabra(pal, pos, tab, mano, dicc, info, resu);
+      write('Se intentó armar la palabra: ');
+      mostrarPalabra(resu.palabra);
+      writeln;
+      write('En la posición: ');
+      imprimirPosicion(resu.pos);
+      writeln;
+      case resu.tipo of
+         NoEntra: writeln('La palabra no entra en el tablero.');
+         NoFichas: writeln('No hay fichas en el atril y tablero para armar la palabra.');
+         NoExiste: writeln('La palabra no existe en el diccionario.');
+         Valida: begin
+            write('Palabra armada "');mostrarPalabra(pal);writeln('" suma ', resu.puntaje:0, ' puntos.');
+            mostrarTablero(tab);
+            mostrarAtril(mano, info);
+         end;
+      end;
+      liberarTexto(dicc);
       writeln('q para terminar...');
       readln(c);
    end;
