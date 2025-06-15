@@ -277,11 +277,15 @@ procedure siguientePosicion(var pos : Posicion);
 begin
     { Actualizar la posición según la dirección }
     if pos.direccion = Horizontal then
-        if pos.col <> MAXCOLUMNAS then
-            pos.col := pos.col + 1 { Avanzar a la siguiente columna }
+    begin
+       if pos.col <> MAXCOLUMNAS then
+            pos.col := pos.col + 1; { Avanzar a la siguiente columna } 
+    end
     else
+    begin
         if pos.fila <> MAXFILAS then
             pos.fila := chr(ord(pos.fila) + 1); { Avanzar a la siguiente fila }
+    end;
 end;
 
 function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero) : boolean;

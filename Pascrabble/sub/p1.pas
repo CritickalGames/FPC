@@ -61,23 +61,29 @@ begin
    tab['I',4].ficha:='r';
    while c <> 'q' do
    begin
-      rellenarAtril(mano);
-      mostrarTablero(tab);
-      //leerLetrasTablero(tab);
-      mostrarAtril(mano, fichas);
-      ingresarPalabra(pal, pos);
-      if puedeArmarPalabra(pal, pos, mano, tab) then
-      begin
-         writeln('Se puede armar la palabra.');
-         {intentarArmarPalabra(pal : Palabra; pos : Posicion; 
-                              var tab : Tablero; var mano : Atril; 
-                              dicc : Texto; info : InfoFichas; 
-                              var resu : ResultadoJugada)}
-         mostrarTablero(tab);
-         intentarArmarPalabra(pal, pos, tab, mano, dicc, fichas, resu);
-      end
-      else
-         writeln('NO se puede armar la palabra.');
+      // rellenarAtril(mano);
+      // mostrarTablero(tab);
+      // //leerLetrasTablero(tab);
+      // mostrarAtril(mano, fichas);
+      // ingresarPalabra(pal, pos);
+      // if puedeArmarPalabra(pal, pos, mano, tab) then
+      // begin
+      //    writeln('Se puede armar la palabra.');
+      //    {intentarArmarPalabra(pal : Palabra; pos : Posicion; 
+      //                         var tab : Tablero; var mano : Atril; 
+      //                         dicc : Texto; info : InfoFichas; 
+      //                         var resu : ResultadoJugada)}
+      //    mostrarTablero(tab);
+      //    intentarArmarPalabra(pal, pos, tab, mano, dicc, fichas, resu);
+      // end
+      // else
+      //    writeln('NO se puede armar la palabra.');
+      leerPosicion(pos);
+      siguientePosicion(pos);
+      writeln('Siguiente posición:');
+      imprimirPosicion(pos);
+      writeLn;
+      writeln('q para terminar...');
       readln(c);
    end;
    {Hipotesis: PuedeArmarPalabra no comprueba si el espacio está ocupado por una ficha.}
