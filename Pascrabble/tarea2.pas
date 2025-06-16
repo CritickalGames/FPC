@@ -214,6 +214,13 @@ begin
     end;
 end;
 
+procedure ocuparCelda(var celda: casillero; l: Letra; var mano: atril);
+begin
+    celda.ocupada := true; {marcar el casillero como ocupado}
+    celda.ficha := l; {asignar la letra al casillero}
+    removerLetraAtril(mano, l);
+end;
+
 function entraEnTablero(pal : Palabra; pos : Posicion) : boolean;
     { Verifica si la palabra `pal` entra en el tablero a partir de la posición `pos`,
     teniendo en cuenta que no debe salirse de los límites del tablero. }
@@ -276,7 +283,6 @@ begin
                 if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
                 begin                        
                     booleano := true;
-                    {eliminar la letra del atril}
                     removerLetraAtril(mano, pal.cadena[i]); {remover la letra del atril}
                 end;
                 j:= j + 1;
@@ -303,8 +309,9 @@ procedure intentarArmarPalabra(pal : Palabra; pos : Posicion;
     como para las bonificaciones **NO** suman las letras ya existentes en el tablero que conforman la palabra. 
     Si no se puede armar la palabra, devuelve el resultado correspondiente en `resu.tipo`. }
     var 
-        i : integer;
+        triple, i : integer;{triple cuenta cuantas veces se aplica el bono}
         b: boolean;
+        celda: casillero;
 begin
     resu.palabra := pal;
     resu.pos := pos;
@@ -338,20 +345,30 @@ begin
         resu.tipo := Valida;
         { Calcular el puntaje de la jugada }
         resu.puntaje := 0;
-        
+        triple:=0;        
         for i in [1..pal.tope] do
         begin
-            if not (tab[pos.fila, pos.col].ocupada) then
-            begin
-                { Si la letra no está ocupada, se agrega al tablero y se suma el puntaje }
-                {a resultado le sumamos info del encabezado}
-                resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
+            celda:= tab[pos.fila, pos.col];
+            if not (celda.ocupada) then
+            begin{ Si la letra no está ocupada, se agrega al tablero y se suma el puntaje }
+                case celda.bonus of {a resultado le sumamos info del encabezado}
+                    Ninguno:resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
+                    DobleLetra:resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje*2;
+                    TriplePalabra:
+                    begin
+                        triple:=triple+1;
+                        resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
+                    end;
+                    Trampa:resu.puntaje := resu.puntaje - info[pal.cadena[i]].puntaje;    
+                end;
                 {agregar la letra al tablero}
-                tab[pos.fila, pos.col].ocupada := true; {marcar el casillero como ocupado}
-                tab[pos.fila, pos.col].ficha := pal.cadena[i]; {asignar la letra al casillero}
+                ocuparCelda(tab[pos.fila, pos.col], pal.cadena[i], mano);
             end;
             siguientePosicion(pos); {avanzar a la siguiente posición}
         end;
+        if triple>0 then
+            for i in [1..triple] do
+                resu.puntaje := resu.puntaje*3;
     end;
 end;
 
