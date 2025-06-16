@@ -1,3 +1,10 @@
+procedure imprimir(pos: Posicion; pal: Palabra; mano: Atril);
+begin
+    writeLn('-----------------');
+    write(pal.cadena, '-', mano.letras,'-');
+    imprimirPosicion(pos); writeLn;
+    writeLn('-----------------');
+end;
 procedure inicializarHistograma(var hist : Histograma);
     { Inicializa el histograma a cero. }
     var 
@@ -247,50 +254,38 @@ function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Ta
         i, j : integer;
         booleano : boolean;
 begin
-    {compruebo si entra en el tablero}
-    if not entraEnTablero(pal, pos) then
-        puedeArmarPalabra := false {no entra en el tablero}
-    else
-    begin
-        {inicializar la variable de retorno a true}
-        puedeArmarPalabra := true;
-        {recorrer cada letra de la palabra}
-        i:= 1; {inicializar el índice de la palabra}
-        booleano := true; {inicializar la variable booleana a true}
-        while (i <=pal.tope) and (booleano) do
+    {recorrer cada letra de la palabra}
+    i:= 1; {inicializar el índice de la palabra}
+    booleano := true; {inicializar la variable booleana a true}
+    repeat
+        {not: si la posición está ocupada y la ficha[i] != cadena[i]}
+        booleano := not (tab[pos.fila, pos.col].ocupada 
+                            and (tab[pos.fila, pos.col].ficha <> pal.cadena[i])
+                        );
+        if booleano  then
         begin
-            {not: si la posición está ocupada y la ficha[i] != cadena[i]}
-            booleano := not (tab[pos.fila, pos.col].ocupada and (tab[pos.fila, pos.col].ficha <> pal.cadena[i]));
-            if booleano  then
+            while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
             begin
-                while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
-                begin
-                    siguientePosicion(pos);
-                    i:=i+1;
-                end;
-                j:= 1;
-                booleano := false;
-                while (j <= mano.tope) and not booleano do {Si booleano es True, sale del bucle }
-                begin
-                    if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
-                    begin                        
-                        booleano := true;
-                        {eliminar la letra del atril}
-                        removerLetraAtril(mano, pal.cadena[i]); {remover la letra del atril}
-                    end;
-                    {letra, atril y booleano}
-                    j:= j + 1;
-                end;
-                siguientePosicion(pos); {avanzar a la siguiente posición}
-                i := i + 1; {avanzar al siguiente índice de la palabra}
+                siguientePosicion(pos);
+                i:=i+1;
             end;
-            
-            puedeArmarPalabra := booleano; {no se puede armar la palabra}
-            
-        end;
-        
-    end;
-
+            j:= 1;
+            booleano := false;
+            while (j <= mano.tope) and not booleano do {Si booleano es True, sale del bucle }
+            begin
+                if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
+                begin                        
+                    booleano := true;
+                    {eliminar la letra del atril}
+                    removerLetraAtril(mano, pal.cadena[i]); {remover la letra del atril}
+                end;
+                j:= j + 1;
+            end;
+            siguientePosicion(pos); {avanzar a la siguiente posición}
+            i := i + 1; {avanzar al siguiente índice de la palabra}
+        end;                        
+    until not ((i <=pal.tope) and (booleano));
+    puedeArmarPalabra := booleano; {no se puede armar la palabra}
 end;
 
 procedure intentarArmarPalabra(pal : Palabra; pos : Posicion; 
@@ -311,6 +306,8 @@ procedure intentarArmarPalabra(pal : Palabra; pos : Posicion;
         i : integer;
         b: boolean;
 begin
+    resu.palabra := pal;
+    resu.pos := pos;
     b:= true;
     { Verificar si la palabra entra en el tablero }
     if not entraEnTablero(pal, pos) then
@@ -339,8 +336,6 @@ begin
     if b then
     begin{ Si llega hasta aquí, la palabra es válida y se puede armar }
         resu.tipo := Valida;
-        resu.palabra := pal;
-        resu.pos := pos; 
         { Calcular el puntaje de la jugada }
         resu.puntaje := 0;
         
