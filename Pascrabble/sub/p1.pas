@@ -6,25 +6,6 @@ program principal;
 {$INCLUDE ../tarea2.pas}
 {$INCLUDE t.pas}
 
-function crearDiccionario():Texto;
-   var
-      dicc: Texto;
-begin
-   {crear un diccionario de palabras con newTexto(var tex : Texto; t: array of char) y addTexto(var tex : Texto; t: array of char)}
-   newTexto(dicc, ['h', 'o', 'l', 'a']);
-   addTexto(dicc, ['m', 'u', 'n', 'd', 'o']);
-   addTexto(dicc, ['p', 'a', 's', 'c', 'r', 'a', 'b', 'l', 'e']);
-   addTexto(dicc, ['p', 'r', 'o', 'g', 'r', 'a', 'm', 'a', 'd', 'o']);
-   addTexto(dicc, ['t', 'e', 's', 't']);
-   addTexto(dicc, ['e', 'j', 'e', 'm', 'p', 'l', 'o']);
-   addTexto(dicc, ['d', 'i', 'c', 'c', 'i', 'o', 'n', 'a', 'r', 'i', 'o']);
-   addTexto(dicc, ['p', 'a', 'l', 'a', 'b', 'r', 'a']);
-   {palabra mesa, amores}
-   addTexto(dicc, ['m', 'e', 's', 'a']);
-   addTexto(dicc, ['a', 'm', 'o', 'r', 'e','s']);
-   crearDiccionario := dicc; {inicializar el diccionario a nil}
-end;
-
 var 
    i: integer;
    hist: Histograma;
@@ -34,7 +15,7 @@ var
    ora: array[1..10] of Texto;
    dicc: Texto;
    booleano: boolean;
-   fichas: InfoFichas;
+   info: InfoFichas;
    mano: Atril;
    tab: Tablero;
    pos: Posicion;
@@ -52,25 +33,28 @@ begin
    c:='a';
    inicializarTablero(tab);
    {iniciar tab en i1a i2m i3o i4r}
-   tab['I',1].ocupada:=true;
-   tab['I',1].ficha:='a';
-   tab['I',2].ocupada:=true;
-   tab['I',2].ficha:='m';
-   tab['I',3].ocupada:=true;
-   tab['I',3].ficha:='o';
-   tab['I',4].ocupada:=true;
-   tab['I',4].ficha:='r';
-   while c <> 'q' do
-   begin
+   // tab['I',1].ocupada:=true;
+   // tab['I',1].ficha:='a';
+   // tab['I',2].ocupada:=true;
+   // tab['I',2].ficha:='m';
+   // tab['I',3].ocupada:=true;
+   // tab['I',3].ficha:='o';
+   // tab['I',4].ocupada:=true;
+   // tab['I',4].ficha:='r';
+   // while c <> 'q' do
+   // begin
       // leerDiccionario(dicc);
       calcularHistogramaTexto(dicc, hist);
       calcularPuntajes(hist, info);
-      rellenarAtril(mano);
+      i:=length(['a','l','o','h']);
+      writeLn(i);
+      rellenarAtrilX(mano, i, ['a','l','o','h']);
       // inicializarTablero(tab);
-      leerLetrasTablero(tab);
+      // leerLetrasTablero(tab);
       mostrarAtril(mano, info);
-      ingresarPalabra(pal, pos);
-
+      ingresarPalabraX(pal, pos, ['h','o','l','a'],'G', 3, 'V');
+      {mostrar fila, col}
+      imprimirPosicion(pos); writeln;
       intentarArmarPalabra(pal, pos, tab, mano, dicc, info, resu);
       write('Se intentó armar la palabra: ');
       mostrarPalabra(resu.palabra);
@@ -89,9 +73,9 @@ begin
          end;
       end;
       liberarTexto(dicc);
-      writeln('q para terminar...');
-      readln(c);
-   end;
+   //    writeln('q para terminar...');
+   //    readln(c);
+   // end;
    {Hipotesis: PuedeArmarPalabra no comprueba si el espacio está ocupado por una ficha.}
 end.
 

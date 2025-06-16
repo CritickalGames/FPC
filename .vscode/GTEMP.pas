@@ -1,3 +1,10 @@
+procedure imprimir(pos: Posicion; pal: Palabra; mano: Atril);
+begin
+    writeLn('-----------------');
+    write(pal.cadena, '-', mano.letras,'-');
+    imprimirPosicion(pos); writeLn;
+    writeLn('-----------------');
+end;
 procedure inicializarHistograma(var hist : Histograma);
     { Inicializa el histograma a cero. }
     var 
@@ -246,52 +253,39 @@ function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Ta
     var 
         i, j : integer;
         booleano : boolean;
-        celda: Casillero;
 begin
-    {compruebo si entra en el tablero}
-    if not entraEnTablero(pal, pos) then
-        puedeArmarPalabra := false {no entra en el tablero}
-    else
-    begin
-        {inicializar la variable de retorno a true}
-        puedeArmarPalabra := true;
-        {recorrer cada letra de la palabra}
-        i:= 1; {inicializar el índice de la palabra}
-        booleano := true; {inicializar la variable booleana a true}
-        while (i <=pal.tope) and (booleano) do
+    {recorrer cada letra de la palabra}
+    i:= 1; {inicializar el índice de la palabra}
+    booleano := true; {inicializar la variable booleana a true}
+    repeat
+        {not: si la posición está ocupada y la ficha[i] != cadena[i]}
+        booleano := not (tab[pos.fila, pos.col].ocupada 
+                            and (tab[pos.fila, pos.col].ficha <> pal.cadena[i])
+                        );
+        if booleano  then
         begin
-            {not: si la posición está ocupada y la ficha[i] != cadena[i]}
-            booleano := not (tab[pos.fila, pos.col].ocupada and (tab[pos.fila, pos.col].ficha <> pal.cadena[i]));
-            if booleano  then
+            while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
             begin
-                while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
-                begin
-                    siguientePosicion(pos);
-                    i:=i+1;
-                end;
-                j:= 1;
-                booleano := false;
-                while (j <= mano.tope) and not booleano do {Si booleano es True, sale del bucle }
-                begin
-                    if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
-                    begin                        
-                        booleano := true;
-                        {eliminar la letra del atril}
-                        removerLetraAtril(mano, pal.cadena[i]); {remover la letra del atril}
-                    end;
-                    {letra, atril y booleano}
-                    j:= j + 1;
-                end;
-                siguientePosicion(pos); {avanzar a la siguiente posición}
-                i := i + 1; {avanzar al siguiente índice de la palabra}
+                siguientePosicion(pos);
+                i:=i+1;
             end;
-            
-            puedeArmarPalabra := booleano; {no se puede armar la palabra}
-            
-        end;
-        
-    end;
-
+            j:= 1;
+            booleano := false;
+            while (j <= mano.tope) and not booleano do {Si booleano es True, sale del bucle }
+            begin
+                if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
+                begin                        
+                    booleano := true;
+                    {eliminar la letra del atril}
+                    removerLetraAtril(mano, pal.cadena[i]); {remover la letra del atril}
+                end;
+                j:= j + 1;
+            end;
+            siguientePosicion(pos); {avanzar a la siguiente posición}
+            i := i + 1; {avanzar al siguiente índice de la palabra}
+        end;                        
+    until not ((i <=pal.tope) and (booleano));
+    puedeArmarPalabra := booleano; {no se puede armar la palabra}
 end;
 
 procedure intentarArmarPalabra(pal : Palabra; pos : Posicion; 
@@ -309,10 +303,11 @@ procedure intentarArmarPalabra(pal : Palabra; pos : Posicion;
     como para las bonificaciones **NO** suman las letras ya existentes en el tablero que conforman la palabra. 
     Si no se puede armar la palabra, devuelve el resultado correspondiente en `resu.tipo`. }
     var 
-        triple, i : integer;{triple representa cuantas veces se aplica el bono Triple}{Aclaración innecesaria: i es un índice}
+        i : integer;
         b: boolean;
-        celda: casillero;
 begin
+    resu.palabra := pal;
+    resu.pos := pos;
     b:= true;
     { Verificar si la palabra entra en el tablero }
     if not entraEnTablero(pal, pos) then
@@ -341,32 +336,22 @@ begin
     if b then
     begin{ Si llega hasta aquí, la palabra es válida y se puede armar }
         resu.tipo := Valida;
-        resu.palabra := pal;
-        resu.pos := pos; 
         { Calcular el puntaje de la jugada }
         resu.puntaje := 0;
-        triple:= 0; {inicializar el contador de triple }
-        celda:= tab[pos.fila, pos.col];
+        
         for i in [1..pal.tope] do
         begin
-            if not (celda.ocupada) then
-            begin{ Si la letra no está ocupada, se agrega al tablero y se suma el puntaje }
-                case celda.bonus of {a resultado le sumamos info del encabezado}
-                    Ninguno: resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
-                    DobleLetra: resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje*2;
-                    Trampa: resu.puntaje := resu.puntaje - info[pal.cadena[i]].puntaje;
-                    TriplePalabra: triple:=triple+1;
-                end;
+            if not (tab[pos.fila, pos.col].ocupada) then
+            begin
+                { Si la letra no está ocupada, se agrega al tablero y se suma el puntaje }
+                {a resultado le sumamos info del encabezado}
+                resu.puntaje := resu.puntaje + info[pal.cadena[i]].puntaje;
                 {agregar la letra al tablero}
-                ponerLetraEnCelda(celda, pal.cadena[i]);
+                tab[pos.fila, pos.col].ocupada := true; {marcar el casillero como ocupado}
+                tab[pos.fila, pos.col].ficha := pal.cadena[i]; {asignar la letra al casillero}
             end;
             siguientePosicion(pos); {avanzar a la siguiente posición}
         end;
-        while (triple>0) do
-        begin
-            resu.puntaje:= resu.puntaje + info[pal.cadena[1]].puntaje*3;{exponente}
-            triple:= triple-1;
-        end;    
     end;
 end;
 
