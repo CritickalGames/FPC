@@ -63,6 +63,7 @@ begin
    addTexto(dicc, ['m', 'e', 's', 'a']);
    addTexto(dicc, ['a', 'm', 'o', 'r', 'e','s']);
    addTexto(dicc, ['r', 'o', 'b', 'o', 't','s']);
+   addTexto(dicc, ['l','a','p','i','c','e','r','a']);
    crearDiccionario := dicc; {inicializar el diccionario a nil}
 end;
 // ------

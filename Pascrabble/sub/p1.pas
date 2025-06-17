@@ -32,27 +32,23 @@ begin
    {while c <> "q"}
    c:='a';
    inicializarTablero(tab);
-   {iniciar tab en i1a i2m i3o i4r}
-   // tab['I',1].ocupada:=true;
-   // tab['I',1].ficha:='a';
-   // tab['I',2].ocupada:=true;
-   // tab['I',2].ficha:='m';
-   // tab['I',3].ocupada:=true;
-   // tab['I',3].ficha:='o';
-   // tab['I',4].ocupada:=true;
-   // tab['I',4].ficha:='r';
+   {iniciar tab en cera horizontal I5 a I8}
+   ocuparCelda(tab['I',5],'c', mano);
+   ocuparCelda(tab['I',6],'e', mano);
+   ocuparCelda(tab['I',7],'r', mano);
+   ocuparCelda(tab['I',8],'a', mano);
    // while c <> 'q' do
    // begin
       // leerDiccionario(dicc);
       calcularHistogramaTexto(dicc, hist);
       calcularPuntajes(hist, info);
-      i:=length(['a','l','o','h']);
+      i:=length(['L', 'R', 'A', 'P', 'A', 'I']);
       writeLn(i);
-      rellenarAtrilX(mano, i, ['a','l','o','h']);
+      rellenarAtrilX(mano, i, ['l', 'r', 'a', 'p', 'a', 'i']);
       // inicializarTablero(tab);
       // leerLetrasTablero(tab);
       mostrarAtril(mano, info);
-      ingresarPalabraX(pal, pos, ['h','o','l','a'],'G', 3, 'V');
+      ingresarPalabraX(pal, pos, ['l','a','p','i','c','e','r','a'],'I', 1, 'H');
       {mostrar fila, col}
       imprimirPosicion(pos); writeln;
       intentarArmarPalabra(pal, pos, tab, mano, dicc, info, resu);

@@ -5,6 +5,21 @@ begin
     imprimirPosicion(pos); writeLn;
     writeLn('-----------------');
 end;
+procedure imprimirIJ(pos: Posicion; pal: Palabra; mano: Atril; I, j:integer);
+begin
+    writeLn('-----------------');
+    write(pal.cadena[i], '-', mano.letras[j],'-Atril: ');
+    for i in [1..mano.tope] do
+    begin
+        if i=j then
+            write(#27'[32m', mano.letras[i],#27'[37m')
+        else
+            write(mano.letras[i]);
+    end;
+        
+    imprimirPosicion(pos); writeLn;
+    writeLn('-----------------');
+end;
 procedure inicializarHistograma(var hist : Histograma);
     { Inicializa el histograma a cero. }
     var 
@@ -259,17 +274,18 @@ function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Ta
     Se puede asumir que la palabra entra en el tablero. }
     var 
         i, j : integer;
-        booleano : boolean;
+        booleano, auxB : boolean;
+        celda :casillero;
 begin
     {recorrer cada letra de la palabra}
     i:= 1; {inicializar el índice de la palabra}
     booleano := true; {inicializar la variable booleana a true}
     repeat
-        {not: si la posición está ocupada y la ficha[i] != cadena[i]}
-        booleano := not (tab[pos.fila, pos.col].ocupada 
-                            and (tab[pos.fila, pos.col].ficha <> pal.cadena[i])
-                        );
-        if booleano  then
+        celda := tab[pos.fila, pos.col];
+        {Si esá ocupado, pero la letra pertenece a la palabra, siguiente letra}
+        auxB := celda.ocupada and (celda.ficha = pal.cadena[i]);
+        booleano := not celda.ocupada;
+        if booleano then
         begin
             while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
             begin
@@ -289,7 +305,13 @@ begin
             end;
             siguientePosicion(pos); {avanzar a la siguiente posición}
             i := i + 1; {avanzar al siguiente índice de la palabra}
-        end;                        
+        end
+        else if auxB then
+        begin
+            booleano := auxB;
+            siguientePosicion(pos);
+            i:=i+1;
+        end;
     until not ((i <=pal.tope) and (booleano));
     puedeArmarPalabra := booleano; {no se puede armar la palabra}
 end;
@@ -347,7 +369,7 @@ begin
         resu.puntaje := 0;
         triple:=0;        
         for i in [1..pal.tope] do
-        begin
+        begin 
             celda:= tab[pos.fila, pos.col];
             if not (celda.ocupada) then
             begin{ Si la letra no está ocupada, se agrega al tablero y se suma el puntaje }
