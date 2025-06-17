@@ -7,14 +7,13 @@ program principal;
 {$INCLUDE t.pas}
 
 var 
-   i: integer;
+   i, puntaje: integer;
    hist: Histograma;
    c: Char;
-   p1, pal: Palabra;
-   p2: Palabra;
-   ora: array[1..10] of Texto;
+   pal: Palabra;
    dicc: Texto;
    booleano: boolean;
+   bolsa: BolsaFichas;
    info: InfoFichas;
    mano: Atril;
    tab: Tablero;
@@ -28,51 +27,25 @@ begin
    {inicializar el histograma a cero}
    for c := 'a' to 'z' do
       hist[c] := 0;
+   puntaje:= 0;
    //TODO operar
-   {while c <> "q"}
-   c:='a';
    inicializarTablero(tab);
-   {iniciar tab en cera horizontal I5 a I8}
-   ocuparCelda(tab['I',5],'c', mano);
-   ocuparCelda(tab['I',6],'e', mano);
-   ocuparCelda(tab['I',7],'r', mano);
-   ocuparCelda(tab['I',8],'a', mano);
-   // while c <> 'q' do
-   // begin
-      // leerDiccionario(dicc);
-      calcularHistogramaTexto(dicc, hist);
-      calcularPuntajes(hist, info);
-      i:=length(['L', 'R', 'A', 'P', 'A', 'I']);
-      writeLn(i);
-      rellenarAtrilX(mano, i, ['l', 'r', 'a', 'p', 'a', 'i']);
-      // inicializarTablero(tab);
-      // leerLetrasTablero(tab);
-      mostrarAtril(mano, info);
-      ingresarPalabraX(pal, pos, ['l','a','p','i','c','e','r','a'],'I', 1, 'H');
-      {mostrar fila, col}
-      imprimirPosicion(pos); writeln;
-      intentarArmarPalabra(pal, pos, tab, mano, dicc, info, resu);
-      write('Se intentó armar la palabra: ');
-      mostrarPalabra(resu.palabra);
-      writeln;
-      write('En la posición: ');
-      imprimirPosicion(resu.pos);
-      writeln;
-      case resu.tipo of
-         NoEntra: writeln('La palabra no entra en el tablero.');
-         NoFichas: writeln('No hay fichas en el atril y tablero para armar la palabra.');
-         NoExiste: writeln('La palabra no existe en el diccionario.');
-         Valida: begin
-            write('Palabra armada "');mostrarPalabra(pal);writeln('" suma ', resu.puntaje:0, ' puntos.');
-            mostrarTablero(tab);
-            mostrarAtril(mano, info);
-         end;
-      end;
-      liberarTexto(dicc);
-   //    writeln('q para terminar...');
-   //    readln(c);
-   // end;
-   {Hipotesis: PuedeArmarPalabra no comprueba si el espacio está ocupado por una ficha.}
+   calcularHistogramaTexto(dicc, hist);
+   calcularPuntajes(hist, info);
+   llenarBolsaFichas(info, bolsa);
+   iniciarAtril(mano);
+   // reponerFichas(bolsa, mano);
+
+   mostrarTablero(tab);
+   mostrarAtril(mano, info);
+   writeln('Puntaje total: ', puntaje:0);
+   capsula6(puntaje, bolsa, mano, tab,info);
+   capsula6(puntaje, bolsa, mano, tab,info);
+   capsula6(puntaje, bolsa, mano, tab,info);
+   capsula6(puntaje, bolsa, mano, tab,info);
+   capsula6(puntaje, bolsa, mano, tab,info);
+   capsula6(puntaje, bolsa, mano, tab,info);
+   capsula6(puntaje, bolsa, mano, tab,info);
 end.
 
 {

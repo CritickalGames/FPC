@@ -282,11 +282,12 @@ begin
     booleano := true; {inicializar la variable booleana a true}
     repeat
         celda := tab[pos.fila, pos.col];
-        {Si esá ocupado, pero la letra pertenece a la palabra, siguiente letra}
+        {Si está ocupado y pertenece a la palabra}
         auxB := celda.ocupada and (celda.ficha = pal.cadena[i]);
         booleano := not celda.ocupada;
-        if booleano then
+        if booleano then {SI ESTÁ VACÍO}
         begin
+            {LLEGA A LA SIGUIENTE CELDA VACÍA}
             while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
             begin
                 siguientePosicion(pos);
@@ -294,6 +295,7 @@ begin
             end;
             j:= 1;
             booleano := false;
+            {RECORRE LA MANO}
             while (j <= mano.tope) and not booleano do {Si booleano es True, sale del bucle }
             begin
                 if (pal.cadena[i] = mano.letras[j]) then {Si la letra coincide con alguna ficha, se cambia a true}
@@ -306,7 +308,7 @@ begin
             siguientePosicion(pos); {avanzar a la siguiente posición}
             i := i + 1; {avanzar al siguiente índice de la palabra}
         end
-        else if auxB then
+        else if auxB then {SI ESTÁ OCUPADO Y PERTENECE A LA PALABRA}
         begin
             booleano := auxB;
             siguientePosicion(pos);

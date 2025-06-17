@@ -103,3 +103,12 @@ begin
    leerPosicionX(pos, cf, cc, caux);
    writeln;
 end;
+
+procedure capsula6(var puntaje: integer; bolsa: BolsaFichas; mano:atril; tab: tablero; info: InfoFichas);
+begin
+    writeLn('REPONER FICHAS EN LA BOLSA');
+    reponerFichas(bolsa, mano);
+    // mostrarTablero(tab);
+    mostrarAtril(mano, info);
+    // writeln('Puntaje total: ', puntaje:0);
+end;
