@@ -1,6 +1,6 @@
 program principal;
 { Con esta directiva queda incluido el archivo definiciones.pas }
-{$INCLUDE ../definiciones.pas}
+{$INCLUDE ../Pascrabble_test/definiciones.pas}
 
 { Con esta directiva queda incluido el archivo tarea2.pas }
 {$INCLUDE ../tarea2.pas}

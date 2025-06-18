@@ -1,111 +1,10 @@
-procedure imprimir(pos: Posicion; pal: Palabra; mano: Atril);
+procedure limpiarHistograma(var hist: Histograma);
+    var c: letra;
 begin
-    writeLn('-----------------');
-    write(pal.cadena, '-', mano.letras,'-');
-    imprimirPosicion(pos); writeLn;
-    writeLn('-----------------');
+    for c in ['a'..'z'] do
+        hist[c] := 0; {inicializar el contador de cada letra a 0}
 end;
-procedure imprimirIJ(pos: Posicion; pal: Palabra; mano: Atril; I, j:integer);
-begin
-    writeLn('-----------------');
-    write(pal.cadena[i], '-', mano.letras[j],'-Atril: ');
-    for i in [1..mano.tope] do
-    begin
-        if i=j then
-            write(#27'[32m', mano.letras[i],#27'[37m')
-        else
-            write(mano.letras[i]);
-    end;
-        
-    imprimirPosicion(pos); writeLn;
-    writeLn('-----------------');
-end;
-procedure inicializarHistograma(var hist : Histograma);
-    { Inicializa el histograma a cero. }
-    var 
-        c : Letra;
-begin
-        {recorrer cada letra de [a..z] y contar las ocurrencias de cada letra en `pal`}
-        for c in ['a'..'z'] do
-        begin
-            {comprueba si la letra vale menos que 1 inicializa en 0}
-            if hist[c] < 1 then
-                hist[c] := 0; {inicializar el contador de cada letra a 0}        
-        end;
-end;
-{
-type
 
-   Letra        = 'a' .. 'z';
-   Palabra	= record
-      cadena : array [1 .. MAXPAL] of Letra;
-      tope   : 0 .. MAXPAL
-   end;
-
-   Histograma =  array [Letra] of integer;
-
-   InfoFicha = record
-      puntaje : integer;
-      cantidad : integer;
-   end;
-
-   InfoFichas = array[Letra] of InfoFicha;
-
-   TipoBonus = (Ninguno, DobleLetra, TriplePalabra, Trampa);
-
-   Casillero = record
-      bonus : TipoBonus;
-      case ocupada : boolean of
-         true : (ficha : Letra);
-         false : (); 
-   end;
-
-   Tablero = array['A'..MAXFILAS, 1..MAXCOLUMNAS] of Casillero;
-
-   TipoDireccion = (Horizontal, Vertical);
-   Posicion = record
-      direccion : TipoDireccion;
-      fila : 'A'..MAXFILAS;
-      col  : 1..MAXCOLUMNAS;
-   end;
-
-
-   BolsaFichas = record
-      letras : array[1..TOTALFICHAS] of Letra;
-      tope : 0 .. TOTALFICHAS;
-   end;
-
-   Atril = record
-      letras : array[1..MAXATRIL] of Letra;
-      tope : 0 .. MAXATRIL;
-   end;
-
-   Texto	= ^NodoPal; 
-   NodoPal	= record  
-      info : Palabra;
-      sig  : Texto
-   end;
-
-   TipoResultado = (Valida, NoEntra, NoFichas, NoExiste);
-
-   ResultadoJugada = record
-      palabra : Palabra;
-      pos : Posicion;
-      case tipo : TipoResultado of
-         Valida : (puntaje : integer);
-         NoEntra : ();
-         NoFichas : ();
-         NoExiste  : ();
-   end;
-
-   HistorialJugadas = ^NodoJugada;
-   NodoJugada = record
-      palabra : Palabra;
-      pos : Posicion;
-      puntaje : integer;
-      sig : HistorialJugadas
-   end;
-}
 procedure calcularHistograma(pal : Palabra; var hist : Histograma);
     { Retorna en `hist` el histograma de `pal`, es decir la cantidad
     de ocurrencias de cada letra en esa palabra.
@@ -116,8 +15,7 @@ procedure calcularHistograma(pal : Palabra; var hist : Histograma);
         c: Letra;
 begin
     {iniicializar el histograma a cero}
-    for c in ['a'..'z'] do
-        hist[c] := 0; {inicializar el contador de cada letra a 0}
+    limpiarHistograma(hist);
     {recorrer cada letra de la palabra}
     for i := 1 to pal.tope do
     begin
@@ -161,20 +59,17 @@ procedure calcularHistogramaTexto(tex : Texto; var hist : Histograma);
         h: Histograma;
         c: Letra;
 begin
-    {inicializar el histograma a cero}
-    inicializarHistograma(h);
-    //!{ limpiar el histograma hist:= h; da error}
+    {inicializar el histograma auxiliar a cero}
+    limpiarHistograma(h);
     {limpia el histograma}
-    for c in ['a'..'z'] do
-        hist[c] := 0; {inicializar el contador de cada letra a 0}
+    limpiarHistograma(hist);
     {recorrer el texto hasta que sea nulo}
     while tex <> nil do
     begin
-        {calcular el histograma de la palabra}
+        {calcular el histograma de la palabra y hustfstlo en el auxiliar}
         calcularHistograma(tex^.info, h);
-        {avanzar al siguiente nodo del texto}
         tex := tex^.sig;
-        {sumar h a histo}
+        {sumar h a hist}
         for c in ['a'..'z'] do
             hist[c] := hist[c] + h[c];
     end;
@@ -198,7 +93,6 @@ begin
             bandera := false; {salir del bucle}
         end
         else
-            {avanzar al siguiente nodo del diccionario}
             dicc := dicc^.sig;
     end;
 end;
@@ -210,7 +104,7 @@ procedure removerLetraAtril(var mano : Atril; let : char);
     var 
         i, pos : integer;
 begin
-    pos := -1; {inicializar posición a -1}
+    pos := -1; {inicializar posición a -1 porque servirá de indice númerico y bandera}
     {buscar la letra en el atril}
     i:=1; 
     while (pos = -1) and (i <= mano.tope) do
@@ -230,6 +124,7 @@ begin
 end;
 
 procedure ocuparCelda(var celda: casillero; l: Letra; var mano: atril);
+    {La letra L ocupa la celda de un tablero y elimina de var mano la letra L.}
 begin
     celda.ocupada := true; {marcar el casillero como ocupado}
     celda.ficha := l; {asignar la letra al casillero}
@@ -241,7 +136,7 @@ function entraEnTablero(pal : Palabra; pos : Posicion) : boolean;
     teniendo en cuenta que no debe salirse de los límites del tablero. }
 begin
     { Verificar si la palabra entra en el tablero según la dirección }
-    if pos.direccion = Horizontal then
+    if pos.direccion = Horizontal then {Se asume por letra que pos está inicializado}
         { Verificar si la palabra cabe en la fila indicada }
         entraEnTablero := (pos.col + pal.tope - 1 <= MAXCOLUMNAS)
     else
@@ -256,16 +151,23 @@ procedure siguientePosicion(var pos : Posicion);
     ni a la última columna si la dirección es horizontal. }
 begin
     { Actualizar la posición según la dirección }
-    if pos.direccion = Horizontal then
+    if pos.direccion = Horizontal then {Se asume por letra que pos está inicializado}
     begin
-       if pos.col <> MAXCOLUMNAS then
+       if pos.col <> MAXCOLUMNAS then {Previene el acceso a una posición fuera de límites }
             pos.col := pos.col + 1; { Avanzar a la siguiente columna } 
     end
     else
     begin
-        if pos.fila <> MAXFILAS then
+        if pos.fila <> MAXFILAS then {Previene el acceso a una posición fuera de límites }
             pos.fila := chr(ord(pos.fila) + 1); { Avanzar a la siguiente fila }
     end;
+end;
+
+procedure avanzar(var i: integer; var pos: Posicion);
+    {Procedure para resumir código en puedeArmarPalabra}
+begin
+    siguientePosicion(pos);
+    i:=i+1;
 end;
 
 function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Tablero) : boolean;
@@ -273,26 +175,22 @@ function puedeArmarPalabra(pal : Palabra; pos : Posicion; mano : Atril; tab : Ta
     considerando las letras disponibles en el atril y en el tablero (respetando su ubicación).
     Se puede asumir que la palabra entra en el tablero. }
     var 
-        i, j : integer;
+        i, j : integer; {Las letras sueltas son siempre indices génericos}
         booleano, auxB : boolean;
         celda :casillero;
 begin
-    {recorrer cada letra de la palabra}
     i:= 1; {inicializar el índice de la palabra}
     booleano := true; {inicializar la variable booleana a true}
-    repeat
-        celda := tab[pos.fila, pos.col];
+    repeat {recorrer cada letra de la palabra}
+        celda := tab[pos.fila, pos.col]; {Creo que la variable facilita leer el código, pero no es necesario a nivel lógico}
         {Si está ocupado y pertenece a la palabra}
         auxB := celda.ocupada and (celda.ficha = pal.cadena[i]);
         booleano := not celda.ocupada;
         if booleano then {SI ESTÁ VACÍO}
         begin
-            {LLEGA A LA SIGUIENTE CELDA VACÍA}
+            {LLEGA A LA SIGUIENTE CELDA VACÍA PARA AHORRAR PROCESOS}
             while tab[pos.fila, pos.col].ocupada and (i <=pal.tope)  do
-            begin
-                siguientePosicion(pos);
-                i:=i+1;
-            end;
+                avanzar(i, pos); {i++; siguientePosicion()}
             j:= 1;
             booleano := false;
             {RECORRE LA MANO}
@@ -311,8 +209,7 @@ begin
         else if auxB then {SI ESTÁ OCUPADO Y PERTENECE A LA PALABRA}
         begin
             booleano := auxB;
-            siguientePosicion(pos);
-            i:=i+1;
+            avanzar(i, pos); {i++; siguientePosicion()}
         end;
     until not ((i <=pal.tope) and (booleano));
     puedeArmarPalabra := booleano; {no se puede armar la palabra}
@@ -339,8 +236,8 @@ procedure intentarArmarPalabra(pal : Palabra; pos : Posicion;
 begin
     resu.palabra := pal;
     resu.pos := pos;
-    b:= true;
-    { Verificar si la palabra entra en el tablero }
+    b:= true; {Si se mantiene True, se puede armar la palabra}
+    { Verificar si no la palabra entra en el tablero }
     if not entraEnTablero(pal, pos) then
     begin
         { Si la palabra no entra en el tablero, se actualiza el resultado }
@@ -348,7 +245,7 @@ begin
         b:= false; {no se puede armar la palabra}
     end;
 
-    { Verificar si se puede armar la palabra }
+    { Verificar si no se puede armar la palabra }
     if not puedeArmarPalabra(pal, pos, mano, tab) then
     begin
         { Si no se pueden armar las fichas, se actualiza el resultado }
@@ -356,7 +253,7 @@ begin
         b:= false; {no se puede armar la palabra}
     end;
 
-    { Verificar si la palabra es válida }
+    { Verificar si no la palabra es válida }
     if not esPalabraValida(pal, dicc) then
     begin
         { Si la palabra no existe en el diccionario, se actualiza el resultado }
@@ -372,7 +269,7 @@ begin
         triple:=0;        
         for i in [1..pal.tope] do
         begin 
-            celda:= tab[pos.fila, pos.col];
+            celda:= tab[pos.fila, pos.col]; {obtiene la información de la celda, sólo por estética}
             if not (celda.ocupada) then
             begin{ Si la letra no está ocupada, se agrega al tablero y se suma el puntaje }
                 case celda.bonus of {a resultado le sumamos info del encabezado}
@@ -386,11 +283,12 @@ begin
                     Trampa:resu.puntaje := resu.puntaje - info[pal.cadena[i]].puntaje;    
                 end;
                 {agregar la letra al tablero}
-                ocuparCelda(tab[pos.fila, pos.col], pal.cadena[i], mano);
+                ocuparCelda(tab[pos.fila, pos.col], pal.cadena[i], mano); {No usar celda porque no actualizaría}
             end;
             siguientePosicion(pos); {avanzar a la siguiente posición}
         end;
-        if triple>0 then
+        {Si el contador de tiple es mayor a cero, triplica el valor de la palbra}
+        if triple>0 then {No uso While para ahorrarme el bloque begin end; y para ahorar una comparación}
             for i in [1..triple] do
                 resu.puntaje := resu.puntaje*3;
     end;
@@ -402,15 +300,16 @@ procedure registrarJugada(var jugadas : HistorialJugadas; pal : Palabra; pos : P
         nuevaJugada : HistorialJugadas;
         aux : HistorialJugadas;
 begin
+    //TODO: Crea nuevo nodo
     new(nuevaJugada); {crear un nuevo nodo}
     nuevaJugada^.palabra := pal; {asignar la palabra}
     nuevaJugada^.pos := pos; {asignar la posición}
     nuevaJugada^.puntaje := puntaje; {asignar el puntaje}
     nuevaJugada^.sig := nil; {inicializar el siguiente nodo a nil}
 
-    if jugadas = nil then
-        jugadas := nuevaJugada {si la lista está vacía, asignar la nueva jugada como la primera}
-    else
+    if jugadas = nil then {si la lista está vacía, asignar la nueva jugada como la primera}
+        jugadas := nuevaJugada
+    else {Si la lista existe, recorre la lista con un auxiliar y asigna el nuevo nodo como el último}
     begin
         aux := jugadas;
         while aux^.sig <> nil do
